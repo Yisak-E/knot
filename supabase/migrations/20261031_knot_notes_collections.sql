@@ -34,7 +34,8 @@ create or replace function public.knot_is_editor()
 returns boolean language sql stable security definer set search_path = ''
 as $$ select exists (select 1 from public.knot_editors e where e.user_id = (select auth.uid())) $$;
 revoke execute on function public.knot_is_editor() from public;
-grant execute on function public.knot_is_editor() to anon, authenticated;
+revoke execute on function public.knot_is_editor() from anon;
+grant execute on function public.knot_is_editor() to authenticated;  -- write policies are authenticated-only
 
 create or replace function public.knot_touch_updated_at()
 returns trigger language plpgsql set search_path = ''
