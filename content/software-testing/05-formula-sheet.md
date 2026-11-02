@@ -1,8 +1,8 @@
 ---
 title: "Exam Cheat Sheet — Formulas & Definitions"
-summary: One-page revision sheet with every formula, definition and must-know list from Chapters 4 and 6.
+summary: One-page revision sheet with every formula, definition and must-know list from Chapters 4, 5 and 6.
 tags: [cheat-sheet, formulas, revision]
-sort: 4
+sort: 5
 ---
 
 ## Coverage-criteria formulas
@@ -62,6 +62,20 @@ Valid vs invalid · Sub-partition · Boundaries · Normal use · Enumerated type
 - **Legacy**: incremental TDD, testing only the code being changed.
 - **Shortfall**: happy paths miss **confused**, **creative** and **malicious** users. Passing ≠ reliable.
 - Fix: **model-based criteria** (engineering, with a sense of completion) over human-based (art).
+
+## Chapter 5 must-knows
+
+- **Test requirement (tr)**: a specific element of an artifact a test must cover. **TR** is the set.
+- **Coverage criterion**: a rule (or rules) that imposes TRs on a test set.
+- **T satisfies C** iff every tr in TR is satisfied by at least one t in T.
+- **Coverage level** = (# TRs satisfied ÷ |TR|) × 100%. E.g. 5/6 ≈ 83%.
+- **Infeasible TR**: cannot be satisfied (dead code, `x > 10 && x < 5`). Detecting them is **undecidable**, so 100% coverage is impossible in practice.
+- **Minimal** set: removing any test breaks coverage. **Minimum** set: no smaller set works (hard to find).
+- **Generator** (create values to satisfy C; research, needs tools) vs **recognizer** (measure existing tests; industry, can mislead).
+- **Subsumption**: C1 subsumes C2 iff every T satisfying C1 also satisfies C2. Flavour ⊇ colour; branch ⊇ statement.
+- **Four structures**: input space · graphs · logic · syntax.
+- Four test activities: **design** (criteria-based / human-based), automation, execution, evaluation.
+- Jelly beans: Lemon Y · Pistachio G · Cantaloupe O · Pear W · Tangerine O · Apricot Y.
 
 ## Triangle facts
 

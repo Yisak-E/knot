@@ -2,7 +2,7 @@
 title: "Ch 6 Part 1 — Input Space Partitioning & IDM"
 summary: Partitions (disjoint + complete), characteristics and blocks, the five-step IDM process, interface- vs functionality-based modelling, block-choosing strategies, triang() and findElement() examples.
 tags: [chapter-6, isp, idm, partitioning]
-sort: 2
+sort: 3
 ---
 
 ## The big idea in one line

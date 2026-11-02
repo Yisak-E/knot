@@ -1,8 +1,8 @@
 ---
 title: "Practice Questions — Class Activities with Answers"
-summary: Every Chapter 6 class activity (Part 1 and Part 2) and the Chapter 4 exercises, with answers hidden until you click.
+summary: Every Chapter 6 class activity (Parts 1 and 2), the Chapter 4 exercises and the Chapter 4–5 concept inventory, with answers hidden until you click.
 tags: [practice, activities, answers, exam-prep]
-sort: 5
+sort: 6
 ---
 
 Try each question first, then click to reveal the answer.
@@ -23,6 +23,44 @@ Try each question first, then click to reveal the answer.
 **Confused:** double-click "Submit Transfer" and check for double processing.
 **Creative:** amount −$100, or destination = own account.
 **Malicious:** tamper with the destination account ID in the HTTP payload to move money from an arbitrary account.
+
+</details>
+
+## Chapter 4 & 5 concept inventory (in-class exercise)
+
+<details><summary>(Ch 4) What is "correctness" in agile processes?</summary>
+
+The system **passes all of its test cases**. It is *existential* correctness: correct for this specific set of tests, not proven for every input.
+
+</details>
+
+<details><summary>(Ch 4) Do TDD tests do a good job testing the software?</summary>
+
+**Not on their own.** TDD tests mostly cover happy paths and miss confused, creative and malicious-user paths. Passing them doesn't mean the software is reliable, and they don't guarantee good coverage.
+
+</details>
+
+<details><summary>(Ch 4) Can we automate our tests without TDD?</summary>
+
+**Yes.** Test automation is a general practice and can be applied to any tests, whether or not they are written first.
+
+</details>
+
+<details><summary>(Ch 4) Can we use TDD without automating our tests?</summary>
+
+**No** (per the textbook). Automation is a **prerequisite** for TDD: the full test set must run after every change, which is only practical when it is automated.
+
+</details>
+
+<details><summary>(Ch 5) What four structures do we use for test criteria?</summary>
+
+**Input space**, **graphs**, **logic expressions** and **syntax (grammars)**.
+
+</details>
+
+<details><summary>(Ch 5) What usually prevents our tests from achieving 100% coverage?</summary>
+
+**Infeasible test requirements** (dead code, contradictory conditions), and detecting them is undecidable. In practice, cost and time limits also keep coverage below 100%.
 
 </details>
 

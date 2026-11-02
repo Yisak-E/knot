@@ -2,7 +2,7 @@
 title: "Ch 6 Part 2 — Combination Criteria & Constraints"
 summary: ACoC, ECC, PWC, TWC, BCC and MBCC with formulas and worked tables, the subsumption hierarchy, the cost comparison, and how each criterion handles infeasible combinations.
 tags: [chapter-6, isp, coverage-criteria, acoc, ecc, pwc, bcc, mbcc]
-sort: 3
+sort: 4
 ---
 
 ## The question Step 4 answers
