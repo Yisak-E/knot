@@ -5,198 +5,113 @@ tags: [chapter-5, coverage-criteria, test-requirements, subsumption]
 sort: 2
 ---
 
-## The big idea in one line
+## Test Design and the Four Testing Activities
 
-We can never test every input, so **coverage criteria** turn an effectively infinite input space into a **finite set of test requirements (TR)**. The criteria also tell us **when to stop**.
+Testing involves four distinct activities, and each requires different skills, background knowledge, education and training. The first is test design, which can be either criteria-based or human-based. Criteria-based test design creates tests that satisfy coverage criteria such as statement, branch or path coverage, with the goal of systematically covering code structures or requirements. The second activity is test automation, the engineering task of turning test designs into runnable code. The third is test execution, the mechanical process of running the tests against the software. The fourth is test evaluation, the analytical process of interpreting results, coverage measurements and pass or fail outcomes.
 
-## 1. Four test activities and where criteria fit
+Criteria-based test design is the most technical and mathematical job in software testing. It requires knowledge of discrete mathematics, programming and testing, which covers much of a traditional computer science degree. It is intellectually stimulating, rewarding and challenging, and it is analogous to software architecture on the development side. For this reason, using people who are not qualified to design tests is a sure way to get ineffective tests. Criteria-based design is very different from "monkey testing", in which a person sits at the keyboard, wiggles the mouse and bangs the keyboard. Monkey testing needs no automation and minimal training, but it is highly redundant and leaves serious blind spots. Criteria-based design searches the input space thoroughly, so that the tests cover as many different types of input as possible, and avoids overlap, so that each test case is unique.
 
-| Stage | Activity | What it needs |
-|---|---|---|
-| **1. Test design** | **(a) Criteria-based**: design tests to satisfy coverage criteria. **(b) Human-based**: design tests from domain knowledge and intuition | (a) is the **most technical and mathematical job** in testing: discrete math, programming, testing |
-| 2. Test automation | Turn designs into runnable scripts | Programming |
-| 3. Test execution | Run the tests and record results | Mechanical, little training |
-| 4. Test evaluation | Interpret results, coverage, pass/fail | Domain knowledge, analysis |
+This approach also changes how testing levels are viewed. The old, phase-based view treats unit, module, integration and system testing as fundamentally different activities that need different methods. The new, structure-based view focuses on the underlying mathematical structures. The foundational test design stays the same at every phase; only the way the model is extracted and the way the values are chosen change.
 
-- Each activity needs **different skills, background, education and training**.
-- Criteria-based test design is **analogous to software architecture** on the development side.
-- ⭐ **Using people who are not qualified to design tests is a sure way to get ineffective tests.**
+In conclusion, test design is a distinct, highly skilled activity, and criteria-based design gives it a systematic, engineering foundation that applies at every testing level.
 
-**"Monkey testing" vs criteria:** monkey testing is a human wiggling the mouse and banging the keyboard. It needs no automation and minimal training, and it is redundant and full of blind spots. Criteria-based design searches the input space systematically and removes redundancy.
+## Model-Driven Test Design
 
-**Phases vs structures:** the old view treats unit, module, integration and system testing as different activities. The new view: test design is **largely the same at every phase**. Only how the model is extracted and how values are chosen change.
+Model-Driven Test Design (MDTD) explains how criteria fit into the testing process. The tester starts with a software artifact at the implementation level and extracts a mathematical model or structure from it, which moves the work up to the abstraction level. A coverage criterion is applied to that structure to generate test requirements. The test requirements are refined into test specifications and then brought back down to the implementation level as input values, test cases, scripts and finally pass or fail results. The key point is that coverage criteria produce test requirements purely at the level of mathematical abstraction, which is why the same criterion can be used for many kinds of artifact.
 
-## 2. Model-Driven Test Design (MDTD)
+This approach should not be confused with model-based testing (MBT). In MBT, the model is created before the code as a specification, it defines the requirements, and it is treated as the truth, with the code derived from it. Its goal is to check that the code conforms to the specification, and it finds gaps between design and implementation. In the model-extracted approach used in this course, the model is extracted directly from the code or design artifacts, it represents the implementation, and the code is treated as the truth. Its goal is to achieve high implementation coverage, and it finds logic errors within the implemented code.
 
-```
-Abstraction level:    Model / Structure  ──criterion──▶  Test Requirements (TR)
-                            ▲                                    │
-                            │ extract                            ▼ refine
-Implementation level: Software artifact          Input values → Test cases → Scripts → Pass/Fail
-```
+In conclusion, MDTD separates the creative work of designing tests at an abstract level from the mechanical work of turning them into concrete, runnable tests.
 
-Coverage criteria produce test requirements **purely at the level of mathematical abstraction**. That is why one criterion works for many kinds of artifacts.
+## Coverage Criteria and Test Requirements
 
-### Model-based vs model-extracted testing
+People often talk about "complete testing", "exhaustive testing" or "full coverage", but these ideas are misleading. The number of potential inputs for most programs is so large that it is effectively infinite and cannot be listed explicitly. Even a simple method such as computeAverage(int A, int B, int C) has 2³² × 2³² × 2³² = 2⁹⁶ possible inputs. Because we cannot test with all inputs, coverage criteria tell us which inputs to use. They divide the input space so as to maximise the number of faults found per test case, and they provide useful rules for when to stop testing.
 
-| | Model-Based Testing (MBT) | Model-extracted (criteria-based, this course) |
-|---|---|---|
-| Model origin | Created **before code**, as a specification | **Extracted** from code or design artifacts |
-| Nature of model | A definition of requirements | A representation of the implementation |
-| Source of truth | Model is "truth", code is derived | Code is "truth", model is derived |
-| Goal | Check conformance to a specification | Achieve high implementation coverage |
-| Bugs found | Gaps between design and implementation | Logic errors in the implemented code |
+A tester's job can be described simply: define a model of the software, then find ways to cover it. A test requirement is a specific element of a software artifact that a test case must satisfy or cover, such as "statement 12 must be executed". Test requirements usually come in sets, and the set is written TR. A coverage criterion is a rule or collection of rules that imposes test requirements on a test set, such as "every statement must be executed at least once". A criterion is therefore a technique for generating test requirements systematically, and it describes them completely and unambiguously. For example, branch coverage gives two test requirements for every decision, one for the true outcome and one for the false outcome, and call coverage gives one test requirement for every method, which must be called at least once.
 
-## 3. Core definitions ⭐⭐
+To judge how good a set of tests is, we measure it against a criterion in terms of coverage. Given a set of test requirements TR for a coverage criterion C, a test set T satisfies C if and only if, for every test requirement tr in TR, there is at least one test t in T that satisfies tr. It is acceptable to satisfy a requirement with more than one test, but that creates redundancy, and because every test has a cost, testers usually prefer to avoid it.
 
-| Term | Definition | Example |
-|---|---|---|
-| **Test requirement (tr)** | A specific element of a software artifact that a test case must **satisfy or cover**. They come in sets, written **TR** | "Statement 12 must be executed" |
-| **Coverage criterion (C)** | A **rule or collection of rules** that impose test requirements on a test set | "Every statement must be executed at least once" |
-| **Coverage** | T satisfies C **iff** for **every** tr in TR there is **at least one** t in T that satisfies tr | |
-| **Infeasible test requirement** | A tr that **cannot be satisfied**: no test values exist that meet it | Dead code; `if (x > 10 && x < 5)` |
-| **Coverage level** | (# TRs satisfied by T) ÷ \|TR\| × 100% | 5 of 6 gives 83% |
+In conclusion, coverage criteria turn an effectively infinite input space into a finite, well-defined set of test requirements, and coverage measures how well a test set meets them.
 
-Why we need criteria: `computeAverage(int A, int B, int C)` has 2³² × 2³² × 2³² = **2⁹⁶** possible inputs. Criteria **divide the input space to maximise faults found per test** and give a **stopping rule**.
+## The Jelly Bean Example
 
-More examples of criteria and their TRs:
-- **Branch coverage**: each decision gives **2 TRs** (true and false).
-- **Call coverage**: each method gives **1 TR** (it is called at least once).
+The textbook illustrates these ideas with a bag of jelly beans. The beans come in six flavours and four colours: Lemon is yellow, Pistachio is green, Cantaloupe is orange, Pear is white, Tangerine is orange and Apricot is yellow. The flavour criterion says that one jelly bean of each flavour must be tasted, so its test requirements are flavour = Lemon, flavour = Pistachio, flavour = Cantaloupe, flavour = Pear, flavour = Tangerine and flavour = Apricot, giving six requirements. The colour criterion says that one bean of each colour must be tasted, giving four requirements: yellow, green, orange and white. The example also shows the controllability problem: if you pick a yellow bean, it could be Lemon or Apricot, and forcing the system into the exact state a test requirement needs is a core challenge of software testing.
 
-## 4. The jelly bean example ⭐
+Consider the test set T1 = {three Lemon, one Pistachio, two Cantaloupe, one Pear, one Tangerine, four Apricot}. It satisfies the flavour criterion, because all six flavours appear at least once, but it contains redundancy because several flavours are tasted more than once. Now consider T2 = {one Lemon, two Pistachio, one Pear, three Tangerine}. It does not satisfy the flavour criterion, because Cantaloupe and Apricot are missing. It does satisfy the colour criterion, however, because Lemon gives yellow, Pistachio gives green, Pear gives white and Tangerine gives orange.
 
-A bag of jelly beans has **6 flavours** and **4 colours**:
+In conclusion, the jelly bean example shows how a criterion generates a precise set of test requirements and how the same test set can satisfy one criterion while failing another.
 
-| Flavour | Lemon | Pistachio | Cantaloupe | Pear | Tangerine | Apricot |
-|---|---|---|---|---|---|---|
-| Colour | Yellow | Green | Orange | White | Orange | Yellow |
+## Coverage Level and Infeasible Requirements
 
-- **Flavour criterion**: taste one of each flavour. **TR = {flavour = Lemon, flavour = Pistachio, flavour = Cantaloupe, flavour = Pear, flavour = Tangerine, flavour = Apricot}**, so 6 TRs.
-- **Colour criterion**: taste one of each colour. TR = {Yellow, Green, Orange, White}, so 4 TRs.
-- Satisfying a TR with more than one test is allowed, but it is **redundancy**. Each test costs something.
-- **Controllability problem:** if you pick a yellow bean, is it Lemon or Apricot? Forcing the system into the exact state a TR needs is a core testing challenge.
+The coverage level of a test set is the number of test requirements it satisfies divided by the total number of test requirements, multiplied by 100%. Coverage level matters for two reasons. First, satisfying a coverage criterion completely is expensive, so teams often compromise by aiming for a certain coverage level. Second, and more importantly, some requirements cannot be satisfied at all. If Tangerine jelly beans are so rare that a bag contains none, the flavour criterion cannot be fully satisfied and the maximum possible coverage is 5/6, about 83%. In such cases it often makes sense to drop the unsatisfiable requirements from TR or to replace them with less demanding ones.
 
-<details><summary>T1 = {3 Lemon, 1 Pistachio, 2 Cantaloupe, 1 Pear, 1 Tangerine, 4 Apricot}. Does T1 satisfy the flavour criterion?</summary>
+A software example works the same way. Suppose an online shop has six test requirements: user login, product search, adding an item to the cart, payment, order confirmation and refund. If the tests satisfy five of them because the payment provider's refund system is unavailable, the coverage level is 5/6 × 100 = 83.33%. If the refund requirement is genuinely impossible to test, it can be removed from TR, and the remaining five requirements give 5/5 = 100% coverage.
 
-**Yes.** All 6 flavours appear at least once. It has redundancy (3 Lemons, 2 Cantaloupes, 4 Apricots), so it is **not minimal**.
+Test requirements that cannot be satisfied are called infeasible: no test case values exist that meet them. There are three typical cases. The first is a contradictory condition, such as `if (x > 10 && x < 5) print("Hello");`, because no value of x can be greater than 10 and less than 5 at the same time. The second is dead code, which can never be executed because it follows a return or throw statement, or sits behind a condition that is always true or always false; for example, in `x = 10; return x; print("Hello");` the print statement can never be reached. The third case shows that infeasibility cannot always be detected: for a condition such as `isPrime(x) && isPrime(x + 1) && isPrime(x² + 1) && isPrime(x³ + 1)`, deciding whether any input makes it true can be as hard as deciding whether the program will ever reach a particular statement. Detecting infeasible test requirements is formally undecidable for most test criteria, meaning that no algorithm can always give the correct answer. As a result, 100% coverage is impossible in practice.
 
-</details>
+In conclusion, coverage level gives a realistic measure of progress, and infeasible requirements explain why testers rarely reach, or even aim for, 100% coverage.
 
-<details><summary>T2 = {1 Lemon, 2 Pistachio, 1 Pear, 3 Tangerine}. Does T2 satisfy the flavour criterion? The colour criterion?</summary>
+## Minimal and Minimum Test Sets
 
-**Flavour: No.** Cantaloupe and Apricot are missing.
-**Colour: Yes.** Lemon gives Yellow, Pistachio gives Green, Pear gives White and Tangerine gives Orange, so all 4 colours are covered.
+Because each test has a cost, testers want test sets without unnecessary redundancy. A test set T is minimal if removing any single test from it would cause T to no longer satisfy all the test requirements. A test set is minimum if there is no smaller set of tests that also satisfies all the test requirements. Every minimum set is also minimal, but a minimal set is not necessarily minimum, and finding a minimum set is hard.
 
-</details>
+A set-covering example makes the difference clear. Suppose the target features are F = {f1, f2, f3} and the candidate tests are e1, which covers f1; e2, which covers f2; e3, which covers f3; and e4, which covers all three features. The subset S1 = {e1, e2, e3} covers all the features, and removing any one of its tests leaves a feature uncovered, so S1 is minimal, with three elements. The subset S2 = {e4} also covers all the features with only one test, and no smaller valid set can exist, so S2 is minimum, and also minimal.
 
-## 5. Coverage level and infeasible requirements ⭐⭐
+In conclusion, a minimal test set has no redundant tests, while a minimum test set is the smallest possible one, which is harder to find.
 
-**Coverage level = (number of TRs satisfied ÷ total number of TRs) × 100%**
+## Two Ways to Use Test Criteria
 
-It matters for two reasons:
-1. **Satisfying a criterion is expensive**, so teams often settle for a target level (e.g. 80%).
-2. **Some requirements cannot be satisfied.** If no Tangerine beans exist in the bag, the best flavour coverage possible is **5/6 ≈ 83%**. It often makes sense to **drop** unsatisfiable TRs or **replace them with less demanding ones**.
+Test criteria can be used in two ways. The first is to directly generate test values that satisfy the criterion, sometimes called the generator approach. This is often assumed by the research community and is the most obvious way to use criteria, but it is very hard without automated tools to support test value generation. The second is to generate test values externally, by hand or with a pseudo-random tool, and then measure the tests against the criterion in terms of coverage. This recognizer approach is usually favoured by industry, because generating tests to directly satisfy a criterion is too hard. However, it is sometimes misleading: if the tests do not reach 100% coverage, it is not always clear what that means. For this reason, test criteria are sometimes called metrics. Both approaches are provably undecidable for most criteria, but recognising whether tests satisfy a criterion is far more achievable than generating tests that do.
 
-**Example: online shop.** TR₁ login, TR₂ search, TR₃ add to cart, TR₄ payment, TR₅ order confirmation, TR₆ refund. The tests satisfy 5 of 6, because the refund provider is down. Coverage = 5/6 × 100 = **83.33%**. If TR₆ is truly impossible to test, remove it, and coverage = 5/5 = **100%**.
+Consider a program that prints "Adult" if age >= 18 and "Minor" otherwise. Branch coverage gives two test requirements: the true branch and the false branch. With the generator approach, the tester knows what must be covered and chooses age = 20 for the true branch and age = 15 for the false branch, giving 2/2 = 100% coverage. With the recognizer approach, the tester might randomly generate ages 20, 25 and 30, all of which take the true branch, so the coverage is only 1/2 = 50%. The generator approach is efficient here, but it can be very difficult for complex code. For a branch guarded by a condition such as x × y + z > 100 and x² − y > 50 and z ≠ 0, choosing values of x, y and z that reach it by hand is extremely difficult.
 
-### Three kinds of infeasibility
+In conclusion, generating tests from a criterion is more direct but harder, while measuring existing tests against a criterion is more practical but can be misleading.
 
-| Kind | Example | Why |
-|---|---|---|
-| **Contradictory condition** | `if (x > 10 && x < 5) print("Hello");` | No x is both > 10 and < 5 |
-| **Dead code** | `x = 10; return x; print("Hello");` | Code after `return` can never run |
-| **Undecidable** | `if (isPrime(x) && isPrime(x+1) && isPrime(x²+1) && isPrime(x³+1))` | No algorithm can always decide whether some input reaches it |
+## Comparing Criteria with Subsumption
 
-> **Exam tip:** detecting infeasible test requirements is **formally undecidable** for most criteria, so **100% coverage is impossible in practice**.
+Coverage criteria are often related to one another and are compared using subsumption. A criterion C1 subsumes a criterion C2 if and only if every test set that satisfies C1 also satisfies C2. In the jelly bean example, satisfying the flavour criterion automatically satisfies the colour criterion, because Lemon and Apricot cover yellow, Pistachio covers green, Cantaloupe and Tangerine cover orange and Pear covers white. Tasting only four well-chosen flavours is enough to cover the colours, so the flavour criterion subsumes the colour criterion but not the other way round. In software, branch coverage subsumes statement coverage: if a test set covers every branch in a program, it is guaranteed to execute every statement. Similarly, from Chapter 6, all combinations coverage subsumes pair-wise coverage.
 
-## 6. Minimal vs minimum test sets ⭐
+Test requirements also only make sense for a specific artifact. In the jelly bean example, the requirement "colour = purple" means nothing, because the factory makes no purple beans. In software, the requirement "execute statement 42" makes sense only if the program has a statement 42. In good practice, the test engineer starts with a software artifact and then chooses a coverage criterion, and combining the two produces the specific set of test requirements that is relevant to the task.
 
-| Term | Definition |
-|---|---|
-| **Minimal** | Removing **any single test** from T makes T stop satisfying all TRs (no redundancy) |
-| **Minimum** | **No smaller set** of tests satisfies all TRs (smallest possible size). This is hard to find |
+In conclusion, subsumption shows which criteria are stronger, so testers can avoid redundant effort by satisfying the stronger criterion.
 
-Every minimum set is minimal, but a minimal set need not be minimum.
+## The Four Structures for Criteria-Based Testing
 
-**Set-covering example:** features F = {f₁, f₂, f₃}; tests e₁ covers {f₁}, e₂ covers {f₂}, e₃ covers {f₃}, e₄ covers {f₁, f₂, f₃}.
-- S₁ = {e₁, e₂, e₃} covers everything, and removing any test loses a feature, so it is **minimal** (size 3), but **not minimum**.
-- S₂ = {e₄} covers everything with 1 test, and nothing is smaller, so it is **minimum** (and also minimal).
+Testing researchers have defined dozens of criteria, but they all apply to just four types of structure: input domains, graphs, logic expressions and syntax descriptions (grammars). This is model-extracted testing, not "model-based testing", which derives tests from a separate model that describes some aspects of the system.
 
-## 7. Two ways to use test criteria ⭐
+The first structure is the input space. The tester divides the input domain into disjoint, complete blocks, using information from function signatures and data types, specifications and system limits, and use cases. For a bank transfer feature transfer(amount, account), the amount might be invalid (amount ≤ 0), valid (0 < amount ≤ 10,000) or over the limit (amount > 10,000), and the target account might be at the same bank, at an external bank, or an invalid IBAN. The test transfer(−50, "External") should be rejected immediately. Key criteria include base choice coverage and all combinations coverage.
 
-| | **1. Generator** (direct generation) | **2. Recognizer** (external measurement) |
-|---|---|---|
-| How | Directly create test values that satisfy the criterion | Create tests some other way (by hand, pseudo-random), then **measure** their coverage |
-| Who favours it | The **research** community | **Industry** (tools measure line/branch coverage) |
-| Problem | **Very hard without automated tools** | Sometimes **misleading**: what does 80% coverage actually mean? |
+The second structure is graphs, which are extracted from UML use cases, finite state machines and source code. In a control flow graph, nodes are code blocks and edges are control decisions; in a finite state machine, nodes are states and edges are transitions; and in a use case graph, nodes are user actions and edges are workflow paths. For a user authentication state machine, the states might be Logged Out, Authenticating, Active Session and Account Locked, with a valid password leading to Active Session and three invalid passwords leading to Account Locked. An edge coverage test would verify the transition from Authenticating to Account Locked. Key criteria include node coverage, edge coverage and prime path coverage.
 
-Both are **provably undecidable** for most criteria, but recognising satisfaction is far easier than generating it. Test criteria are sometimes called **metrics**.
+The third structure is logic expressions, which are extracted from decisions in source code, guards on transitions, conditionals in use cases, and business rules or decision tables, and may be written in disjunctive normal form. For a loan approval rule P = (CreditScore > 700 AND Income > $50k) OR HasGuarantor, correlated active clause coverage tests the HasGuarantor clause while keeping the first part false. The pair (score 650, income $40k, guarantor true), which passes, and (score 650, income $40k, guarantor false), which fails, shows that HasGuarantor alone determines the outcome. Key criteria include clause coverage, combinatorial coverage and active clause coverage.
 
-**Example:** `if (age >= 18) Adult else Minor` gives TR₁ (true branch) and TR₂ (false branch).
-- **Generate:** choose age = 20 and age = 15, so coverage is 2/2 = **100%**.
-- **Measure:** random ages 20, 25, 30 are all true, so coverage is 1/2 = **50%**.
-- Generation is hard for complex code: which x, y, z reach `if (x*y + z > 100 && x² − y > 50 && z != 0)`?
+The fourth structure is syntax, described by grammars such as BNF, XML or JSON schemas. Syntax-based testing generates valid and invalid input strings to test parsers and message formats, and it also uses mutation analysis, which deliberately seeds faults into code to evaluate the quality of a test suite. For example, if the original code is `if (balance >= amount)` and a mutant changes it to `if (balance > amount)`, a test with balance equal to amount must fail on the mutant in order to "kill" it. Grammar-based fuzzing might also pass the string "100" where an integer 100 is expected. Key criteria include terminal symbol coverage, production coverage and the mutation score.
 
-## 8. Subsumption ⭐⭐
+In conclusion, input spaces, graphs, logic and syntax are the four structures behind every coverage criterion, which means that a small set of ideas can be applied across all kinds of software artifact.
 
-> **Criterion C1 subsumes C2 if and only if every test set that satisfies C1 also satisfies C2.**
+## Advantages and Disadvantages of Criteria-Based Test Design
 
-- Jelly beans: the **flavour criterion subsumes the colour criterion**. Tasting all 6 flavours guarantees all 4 colours, but 4 well-chosen flavours already cover all colours, so colour does not subsume flavour.
-- Code: **branch coverage subsumes statement coverage**. Covering every branch executes every statement.
-- Ch 6 example: ACoC subsumes PWC, which subsumes ECC.
+Traditionally, testers entered test cases manually, ran them and checked the software's response, which is time-consuming and costly. Formal coverage criteria make testing more systematic by helping testers decide which test inputs are necessary to assess the software thoroughly. Following them makes it more likely that the tester will find problems, gives greater assurance that the software is of high quality and reliability, defines a goal or stopping rule for testing, and makes testing more efficient and effective.
 
-A TR only makes sense for a real artifact: "execute statement 42" requires a statement 42, and "colour = purple" means nothing if no purple beans exist. Engineers start with an **artifact**, then choose a **criterion**, and the two together give the concrete TR.
+Criteria maximise the "bang for the buck". They need fewer tests than human-based approaches while producing a comprehensive test set with minimal overlap in fault-revealing ability. They provide traceability from software artifacts to tests, so the reason for every test is answered. They have built-in support for regression testing. They give a stopping rule, with advance knowledge of how many tests are needed. They are also natural to automate. On the other hand, criteria-based design can be time-consuming and potentially costly, it may produce a large number of test cases, and it requires testing expertise. Coverage does not equal defect detection, criteria may miss unexpected or unanticipated faults, the tests need maintenance when the system changes, and some tests may be unnecessary or of low value.
 
-## 9. The four structures for test criteria ⭐⭐
+A good criterion should make it easy to compute the test requirements automatically and efficient to generate test values, and the resulting tests should reveal as many faults as possible. Researchers still need to provide more data on how to compare criteria. Taken together, the approach works like an optimisation pipeline: the software is mapped as structures, criteria filter the infinite input space down to a finite set of test requirements, subsumption eliminates overlap between criteria, and minimal test sets strip out redundancy, limited only by infeasibility.
 
-Dozens of criteria exist, but they all apply to just **four structures**:
+In conclusion, criteria-based design trades some cost and required expertise for tests that are more effective, traceable and easier to automate.
 
-| Structure | Applied to | Key criteria | Example |
-|---|---|---|---|
-| **Input space** (input domain) | Source, specs, use cases | ECC, PWC, BCC, ACoC | `transfer(amount, account)`: amount ≤ 0 / 0 < amount ≤ 10,000 / > 10,000; account same bank / external / invalid IBAN. `transfer(−50, "External")` should be rejected immediately |
-| **Graphs** | Source (CFG), specs, design (FSM), use cases | Node (NC), Edge (EC), Prime Path (PPC) | Login FSM: Logged Out → Authenticating → Active Session or Account Locked (3 invalid passwords). EC test: Authenticating → Locked |
-| **Logic expressions** | Source decisions, specs, FSM guards, DNF | Clause (CC), Combinatorial (CoC), Active Clause (CACC/MACC) | P = (Score > 700 ∧ Income > 50k) ∨ HasGuarantor. CACC pair: (650, 40k, **T**) passes and (650, 40k, **F**) fails |
-| **Syntax** (grammars) | Source, models, integration, input (BNF/XML/JSON) | Terminal symbol, production, **mutation score** | Mutant `balance >= amount` becomes `balance > amount`. A test with balance == amount **kills** it |
+## Criteria-Based Testing in Practice
 
-Graphs come from UML use cases, FSMs and source code. Logic comes from decisions in source, transition guards and conditionals in use cases.
+Many companies still use monkey testing, with no automation and minimal training, and some automate tests designed by humans. However, companies that use both automation and criteria-based testing save money, find more faults and build better software. Adoption faces four roadblocks: a lack of education, since few computer science programs require testing courses; the need to change the development process, which is fundamental and expensive; tools that are hard to use because they require users to understand the underlying mathematics; and weak tools that rarely solve the central problem of generating test values automatically.
 
-> **Note:** these are criteria on structures **extracted** from software, not "model-based testing", which derives tests from a separate specification model.
+Several changes in practice are recommended. Test and QA teams need better tools, more education, more technical expertise and more specialisation, a trend that already happened in development in the 1990s. Teams should be reorganised to use individual abilities effectively, since one "math-head" can support many testers. Teams should be retrained to use a process such as MDTD and to learn more testing concepts. Researchers should be embedded in teams where needed, and industry should get involved in curriculum design through advisory boards. Researchers and educators, in turn, should hide the deep theory inside usable tools, embed mathematical ideas in practitioner-focused tools, show the economic return of automated test data generation through experiments, and teach test design, automation and TDD as core subjects.
 
-## 10. Advantages and disadvantages of criteria-based design ⭐
+In conclusion, criteria-based testing works best when organisations combine it with automation, skilled test designers and good tools.
 
-| Advantages | Disadvantages |
-|---|---|
-| Maximum **"bang for the buck"**: fewer tests than human-based design, minimal overlap in fault-revealing ability | Time-consuming and potentially costly |
-| **Traceability** from artifacts to tests: the "why" of each test is answered | May produce many test cases |
-| Built-in support for **regression testing** | Requires testing expertise |
-| A **stopping rule**: you know in advance how many tests are needed | **Coverage ≠ defect detection** |
-| Natural to **automate** | May miss unexpected faults; needs maintenance as the system changes; can create low-value tests |
+## Summary of Chapters 1 to 5
 
-What we want from a criterion:
-- It should be **easy to compute** the test requirements automatically.
-- It should be **efficient to generate** test values.
-- The tests should **reveal as many faults as possible**.
+We test to reduce the risk of using software, and the key concepts are faults, failures and the RIPR model. In the test process maturity levels, level 4 is a mental discipline that improves the quality of the software. Model-driven test design separates testing into four types of activity: test design, automation, execution and evaluation. Test automation depends on testability, observability, controllability and test automation frameworks, and test-driven development puts tests first. Criteria-based test design rests on four structures, from which test requirements and criteria are defined.
 
-Researchers still need more data on how to compare criteria.
-
-**The optimisation pipeline:** (1) **map** the software as structures, (2) **filter** the infinite input space with criteria into TRs, (3) **eliminate overlap** with subsumption, (4) **strip redundancy** with minimal test sets, bounded by infeasibility.
-
-## 11. Criteria-based testing in practice
-
-- Many companies still use **monkey testing**; some automate human-designed tests.
-- Companies that use **both automation and criteria-based testing** **save money, find more faults, and build better software**.
-- **Roadblocks:** lack of education (few testing courses), the need to change process, tools that are hard to use, and weak tools that rarely generate test values automatically.
-- **Changes in practice:** reorganise teams by ability (**one "math-head" can support many testers**), retrain teams using **MDTD**, and embed researchers in teams.
-- **Needed from researchers and educators:** isolate and hide the theory inside usable tools, embed the ideas in tools, show the ROI of automated test data generation by experiment, and restructure curricula to teach test design, automation and TDD.
-
-## 12. Quick summary of Chapters 1–5
-
-- **Why test:** to reduce the risk of using software. Faults, failures, the **RIPR** model.
-- **Process maturity:** level 4 is a mental discipline that improves software quality.
-- **MDTD**, and the **four test activities**: design, automation, execution, evaluation.
-- **Test automation:** testability, observability, controllability, frameworks. **TDD**.
-- **Criteria-based design:** four structures, test requirements and criteria.
-- Earlier and better testing empowers test managers.
+In conclusion, earlier and better testing empowers test managers, and criteria-based test design is the engineering foundation that makes better testing possible.
 
 ## Self-test
 
@@ -250,6 +165,6 @@ C1 subsumes C2 iff every test set satisfying C1 also satisfies C2. Examples: the
 
 <details><summary>Q9. Give three advantages and two disadvantages of criteria-based test design.</summary>
 
-Advantages: fewer, less redundant tests; traceability; regression support; a stopping rule; easy to automate. Disadvantages: costly and needs expertise; many tests; coverage ≠ defect detection; may miss unexpected faults; maintenance.
+Advantages: fewer, less redundant tests; traceability; regression support; a stopping rule; easy to automate. Disadvantages: costly and needs expertise; many tests; coverage ≠ defect detection; may miss unexpected faults; needs maintenance.
 
 </details>

@@ -14,11 +14,14 @@ When the user shares lecture slides or handouts and asks for notes:
 2. Create `content/<subject-slug>/_subject.md` (title, code, description, color, sort) if the subject is new.
 3. Write notes as numbered files, following the style of `content/software-testing/`:
    - Front matter: `title`, `summary`, `tags: [..]`, `sort`.
-   - Start with "The big idea in one line", use `##` sections, tables for comparisons, `> **Exam tip:**` callouts,
-     and ⭐ on must-know items.
-   - End each note with a `## Self-test` section of `<details><summary>Question</summary>` blocks, leaving a
+   - **Chapter notes are flowing prose (the user's chosen format).** Each topic is a `## Topic Title` heading,
+     then an introductory paragraph that defines the idea, explanatory paragraphs that weave the worked examples
+     into sentences ("For example, …", "In contrast, …"), and a final paragraph starting "In conclusion, …".
+     No bullet lists or tables in chapter notes, and no LaTeX (write maths in plain text, e.g. 3 × 2 = 6).
+     Short code blocks are fine where the code itself is the example.
+   - End each chapter note with a `## Self-test` section of `<details><summary>Question</summary>` blocks, leaving a
      blank line after `<summary>…</summary>` and before `</details>` so the markdown inside renders.
-   - Add a cheat-sheet note and a practice-questions note (activities with hidden answers) when there is enough material.
+   - The cheat-sheet and practice-questions notes stay as compact lists and tables, since they are for quick revision.
 4. Check facts and arithmetic against the source; label anything not in the source (e.g. "sample solution").
 5. Commit as the user. Every commit must be authored by Yisak-E:
    `git -c user.name="Yisak Metaferiya" -c user.email="yisakmetaferiya1@gmail.com" commit ...`
