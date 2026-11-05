@@ -29,6 +29,8 @@ sort: 8
 - **Application layer:** if neither IPsec nor TLS is used, developers build security into their own applications, e.g. protecting remote login with **Secure Shell (SSH)**.
 - **Link layer:** e.g. WPA for Wi-Fi.
 
+**Further reading:** [Types of Internet Security Protocols (GeeksforGeeks)](https://www.geeksforgeeks.org/types-of-internet-security-protocols/) · [Why HTTP is not Secure? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/why-http-is-not-secure/) · [Cryptography and Network Security Principles (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/cryptography-and-network-security-principles/)
+
 **In conclusion:** Internet security protocols exist because the original protocols assumed a trustworthy environment, and security was later added as extensions at different layers of the stack.
 
 ## Threats to Web Security
@@ -46,6 +48,8 @@ sort: 8
 - **Integrity and authenticity:** cryptographic hash functions combined with message authentication such as **HMAC**.
 - **Confidentiality:** **encryption** of transmitted information.
 - **Identity:** authentication mechanisms such as **digital signatures, certificates and cryptographic authentication protocols**.
+
+**Further reading:** [Threat, Vulnerability, Risk and Exploit (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/threat-vulnerability-risk-and-exploit/) · [OSI Security Architecture (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/osi-security-architecture/) · [Types of Security Mechanism (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/types-of-security-mechanism/) · [What is HMAC? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-hmachash-based-message-authentication-code/)
 
 **In conclusion:** web security must address integrity, confidentiality, availability and authentication; each threat needs its own countermeasure, although denial of service remains particularly hard to prevent.
 
@@ -67,6 +71,8 @@ sort: 8
 - Look at the source and destination **IP addresses** to decide how to forward each packet.
 - Hold information about multiple networks (LAN, WAN, VLAN) and pass traffic between them = **routing**.
 - A **Layer 3 switch** sits between a Layer 2 switch and a gateway router: more than a Layer 2 switch, less than a full router.
+
+**Further reading:** [TCP/IP Model (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/tcp-ip-model/) · [Network Devices: Hub, Switch, Router, Gateway (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/network-devices-hub-repeater-bridge-switch-router-gateways/) · [Difference between Layer-2 and Layer-3 Switches (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/difference-between-layer-2-and-layer-3-switches/) · [Difference Between Router and Layer-3 Switch (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/difference-between-router-and-layer-3-switch/)
 
 **In conclusion:** knowing which devices process which layers explains what each security approach protects and what an attacker on the path can still see.
 
@@ -97,6 +103,8 @@ sort: 8
 - ❌ Incorrect implementations introduce serious vulnerabilities → never design your own algorithms or implement primitives from scratch; use trusted, well-tested libraries and established protocols.
 
 **Examples:** SSH, S/MIME for email, OpenPGP.
+
+**Further reading:** [Introduction to SSH (Secure Shell) Keys (GeeksforGeeks)](https://www.geeksforgeeks.org/introduction-to-sshsecure-shell-keys/) · [PGP vs S/MIME (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/difference-between-pgp-and-s-mime/) · [What is Secure Email? (GeeksforGeeks)](https://www.geeksforgeeks.org/what-is-secure-email/)
 
 **In conclusion:** application-level security gives true end-to-end protection tailored to one application, at the cost of every application having to implement security correctly on its own.
 
@@ -139,6 +147,8 @@ sort: 8
 **Combining levels**
 - Example: an email encrypted with **S/MIME** (application level) sent over a **TLS-protected connection**. S/MIME protects the message itself; TLS protects the channel.
 
+**Further reading:** [Transport Layer Security (TLS) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/transport-layer-security-tls/) · [Difference Between SSL and TLS (GeeksforGeeks)](https://www.geeksforgeeks.org/difference-between-secure-socket-layer-ssl-and-transport-layer-security-tls/) · [Differences Between TLS 1.2 and TLS 1.3 (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/differences-between-tls-1-2-and-tls-1-3/)
+
 **In conclusion:** transport-level security lets any TCP application gain strong, standardised protection through a library such as OpenSSL, as long as the application is built to use it.
 
 ## Network-Level Security (IPsec)
@@ -179,6 +189,8 @@ sort: 8
 - ❌ Mostly used for tunnelling.
 - ❌ Configuration and management (security associations, keys, network policies) are more complex than TLS.
 - ❌ Extra headers and encryption overhead can affect performance.
+
+**Further reading:** [IP Security (IPSec) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ip-security-ipsec/) · [Virtual Private Network (VPN) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-vpn-how-it-works-types-of-vpn/) · [Types of VPN and its Protocols (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/types-of-virtual-private-network-vpn-and-its-protocols/)
 
 **In conclusion:** IPsec protects all IP traffic independently of applications and transport protocols, and in tunnel mode can hide ports and internal addresses, but it does not always give true application-to-application protection.
 
@@ -224,6 +236,8 @@ sort: 8
 - ❌ Both endpoints of the link must be configured.
 - ❌ Strength depends on configuration: weak passwords, outdated settings or compromised access points reduce protection.
 
+**Further reading:** [What is WPA3 vs WPA2? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-wpa3-vs-wpa2/) · [Difference between WEP and WPA (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/difference-between-wep-and-wpa/) · [Wireless Encryption Methods (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/wireless-encryption-methods-in-cisco/)
+
 **In conclusion:** link-level security such as WPA2 or WPA3 protects everything sent over one link, but because protection ends at the access point, TLS or IPsec is still needed beyond the local network.
 
 ## Comparing the Security Options in TCP/IP
@@ -243,6 +257,8 @@ sort: 8
 **In practice**
 - Most widely used: **application-level security and TLS** — SSH for remote access, S/MIME and OpenPGP for email/messages, TLS for the web (HTTPS).
 - IPsec is widely used in **VPNs, enterprise networks and site-to-site links**, but rarely as the main protection for ordinary web browsing.
+
+**Further reading:** [Types of Internet Security Protocols (GeeksforGeeks)](https://www.geeksforgeeks.org/types-of-internet-security-protocols/) · [OSI and TCP/IP Model (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/difference-between-osi-model-and-tcp-ip-model/) · [What is QUIC and HTTP/3? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-quic-and-http-3/)
 
 **In conclusion:** the right choice depends on what must be protected, where protection must apply, and whether it must cover the whole communication path.
 
@@ -276,6 +292,8 @@ sort: 8
 
 - Session management is needed because HTTP is stateless: the server uses something like a **session ID** to link one request to the next.
 - The username and password must themselves be sent encrypted.
+
+**Further reading:** [HTTP vs HTTPS (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/difference-between-http-and-https-2/) · [Why HTTP is not Secure? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/why-http-is-not-secure/) · [Difference Between Session and Cookies (GeeksforGeeks)](https://www.geeksforgeeks.org/javascript/difference-between-session-and-cookies/) · [Web Protocols (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/web-protocols/)
 
 **In conclusion:** plain HTTP is stateless and unencrypted, so web applications need HTTPS, certificates, password authentication, session management and access control to be secure.
 
@@ -326,6 +344,8 @@ sort: 8
 - **Perfect forward secrecy (PFS):** new session keys per connection, so even if the server's private key is stolen later, past communication cannot be decrypted.
 - **Renegotiation:** client and server can refresh session keys without opening a new connection.
 
+**Further reading:** [HyperText Transfer Protocol Secure – HTTPS (GeeksforGeeks)](https://www.geeksforgeeks.org/html/explain-working-of-https/) · [What are Digital Certificates? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-are-digital-certificates/) · [Perfect Forward Secrecy (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/perfect-forward-secrecy/) · [RFC 2818: HTTP Over TLS (RFC Editor)](https://www.rfc-editor.org/rfc/rfc2818)
+
 **In conclusion:** HTTPS runs ordinary HTTP inside TLS on port 443, encrypting URLs, content, forms, cookies and headers, authenticating the server with a certificate, and requiring careful handling of connection closure.
 
 ## Secure Sockets Layer and Transport Layer Security
@@ -347,6 +367,8 @@ sort: 8
   - **Change Cipher Spec Protocol:** changes the cipher in use for the connection.
   - **Alert Protocol:** alerts the peer to status, warnings and errors.
 - Before communicating securely, client and server perform the handshake to negotiate the **TLS version, encryption algorithms and key exchange mechanism**.
+
+**Further reading:** [Secure Socket Layer (SSL) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/secure-socket-layer-ssl/) · [Working of SSL (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/working-of-ssl/) · [SSL vs HTTPS (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ssl-vs-https-which-one-is-more-secure/)
 
 **In conclusion:** SSL/TLS is a layered set of protocols on top of TCP; the record protocol provides protection and three higher protocols manage the handshake, cipher changes and alerts.
 
@@ -375,6 +397,8 @@ sort: 8
 4. If the server finds the session in its cache and accepts it → returns the same session ID and continues with an **abbreviated handshake**.
 5. Otherwise → issues a new session ID and performs a **full handshake**.
 
+**Further reading:** [Secure Socket Layer (SSL) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/secure-socket-layer-ssl/) · [What is SSL/TLS Handshake? (GeeksforGeeks)](https://www.geeksforgeeks.org/what-is-ssl-tls-handshake/)
+
 **In conclusion:** a session holds the negotiated security parameters and can be shared by many connections, which reduces the cost of repeated handshakes.
 
 ## The SSL Record Protocol
@@ -401,6 +425,8 @@ sort: 8
 
 **Receiving:** the record travels in a TCP segment; on receipt the data is **decrypted, verified, decompressed and reassembled**, then delivered to the higher layer.
 
+**Further reading:** [Secure Socket Layer (SSL): Record Protocol section (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/secure-socket-layer-ssl/) · [Working of Message Authentication Code (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/how-message-authentication-code-works/)
+
 **In conclusion:** the Record Protocol fragments, optionally compresses, authenticates with a MAC, encrypts and labels every piece of data that SSL carries.
 
 ## The Change Cipher Spec and Alert Protocols
@@ -424,6 +450,8 @@ sort: 8
   - compression or decompression failures;
   - unexpected termination;
   - protocol version mismatches.
+
+**Further reading:** [Secure Socket Layer (SSL): Change Cipher Spec and Alert sections (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/secure-socket-layer-ssl/) · [Working of SSL (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/working-of-ssl/)
 
 **In conclusion:** the Change Cipher Spec Protocol switches the connection to the newly negotiated cipher with a single byte, and the Alert Protocol reports warnings and fatal errors in two-byte messages.
 
@@ -458,6 +486,8 @@ It is a series of messages organised into **four phases**.
 - Client immediately sends **finished** under the new algorithms and keys (verifies key exchange and authentication succeeded).
 - Server responds with its own change_cipher_spec and finished.
 - Handshake complete → **application data** can be exchanged.
+
+**Further reading:** [What is SSL/TLS Handshake? (GeeksforGeeks)](https://www.geeksforgeeks.org/what-is-ssl-tls-handshake/) · [Transport Layer Security (TLS) Handshake (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/transport-layer-security-tls-handshake/) · [Secure Socket Layer (SSL) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/secure-socket-layer-ssl/)
 
 **In conclusion:** the four-phase handshake lets client and server agree on algorithms, authenticate each other and establish keys before any application data is sent.
 
@@ -509,6 +539,8 @@ It is a series of messages organised into **four phases**.
 **Why radix-64?**
 - The signature is binary; some email software interprets control characters such as line feeds, which could alter it.
 - So the signature (or signature + message) is mapped into printable ASCII using **radix-64 (base64)**: every **3 bytes** of binary data → **4 ASCII characters**.
+
+**Further reading:** [What is S/MIME? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-s-mime/) · [PGP vs S/MIME (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/difference-between-pgp-and-s-mime/) · [Digital Signatures and Certificates (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/digital-signatures-certificates/) · [MIME Protocol (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/multipurpose-internet-mail-extension-mime-protocol/)
 
 **In conclusion:** MIME lets email carry rich content, and S/MIME adds signatures and encryption by combining a private-key signature, a symmetric session key and the recipient's public key, with base64 encoding for safe transport.
 
@@ -719,6 +751,8 @@ It is a series of messages organised into **four phases**.
 - **Sequence number (32 bits):** increases monotonically; unique number per packet in an SA for **anti-replay** protection.
 - ESP also adds a **trailer** and an **authentication field** after the data.
 
+**Further reading:** [IP Security (IPSec) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ip-security-ipsec/) · [IPSec Architecture (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ipsec-architecture/) · [Encapsulating Security Payload (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-encapsulating-security-payload/)
+
 **In conclusion:** IPsec secures all IP traffic through ESP and IKEv2 key exchange, and its placement in firewalls and routers makes it strong, hard to bypass and transparent to applications and users.
 
 ## IPsec Transport and Tunnel Modes
@@ -745,6 +779,8 @@ It is a series of messages organised into **four phases**.
 3. If so, the firewall encapsulates it with an outer IP header: source = this firewall, destination = the firewall at the edge of B's network.
 4. Intermediate routers see **only the outer header**.
 5. At B's firewall the outer header is removed and the inner packet is delivered to B.
+
+**Further reading:** [IPsec Tunnel and Transport Modes (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ipsec-internet-protocol-security-tunnel-and-transport-modes/) · [What is an IPsec Tunnel? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-an-ipsec-tunnel/)
 
 **In conclusion:** transport mode protects the payload between two hosts, while tunnel mode protects the whole packet between security gateways and is the basis of IPsec VPNs.
 
@@ -779,6 +815,8 @@ It is a series of messages organised into **four phases**.
   - **destination IP address**;
   - **security protocol** (AH or ESP).
 - SAs are stored in the **Security Association Database (SAD)**; the rules deciding which traffic gets IPsec are in the **Security Policy Database (SPD)** (general knowledge).
+
+**Further reading:** [IPSec Architecture (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ipsec-architecture/) · [IP Security (IPSec) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ip-security-ipsec/)
 
 ### Transport mode: end-to-end (host-to-host)
 
@@ -928,6 +966,8 @@ It is a series of messages organised into **four phases**.
 | Transport | TLS |
 | Network | IPsec |
 | Link | WPA |
+
+**Further reading:** [Types of Internet Security Protocols (GeeksforGeeks)](https://www.geeksforgeeks.org/types-of-internet-security-protocols/) · [What is Network Security? (GeeksforGeeks)](https://www.geeksforgeeks.org/network-security/) · [Cyber Security Tutorial (GeeksforGeeks)](https://www.geeksforgeeks.org/cybersecurity/cyber-security-tutorial/)
 
 **In conclusion:** the Internet's original protocols were not secure, and modern protection comes from layered extensions, each with its own trade-offs between coverage, transparency and end-to-end protection.
 
