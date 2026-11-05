@@ -748,6 +748,169 @@ It is a series of messages organised into **four phases**.
 
 **In conclusion:** transport mode protects the payload between two hosts, while tunnel mode protects the whole packet between security gateways and is the basis of IPsec VPNs.
 
+## IPsec in Detail: Layer, Modes, AH, ESP and IKE
+
+*Quick-revision bullet notes. Points marked (general knowledge) go beyond the slides. Each topic ends with text-based reference articles.*
+
+### Where IPsec is implemented (which layer)
+
+- **Network layer (Layer 3)** of the OSI model / **Internet layer** of TCP/IP.
+- Sits **between the transport layer (TCP/UDP) and the data link layer**: it protects IP packets.
+- Works with both **IPv4 and IPv6**.
+- **Below the transport layer**, so it is:
+  - **transparent to applications:** no change to application or server software;
+  - **independent of the transport protocol:** protects TCP, UDP, ICMP and any other IP traffic.
+- **Where it physically runs**
+  - In the **operating system** (kernel network stack) of a host, for end-to-end protection.
+  - In **security gateways**: firewalls, routers and VPN concentrators, for tunnels between networks.
+- **Compared with the other layers**
+  - TLS is at the transport layer (protects one TCP connection, needs the application to use it).
+  - S/MIME, PGP and SSH are at the application layer (protect one application).
+  - WPA is at the link layer (protects one link only).
+
+**Further reading:** [IP Security (IPSec) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ip-security-ipsec/) · [IPSec Architecture (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ipsec-architecture/)
+
+### Security Associations (SA): the basis of every mode
+
+- An **SA** is a **one-way** (simplex) agreement between two peers on how to protect traffic: protocol (AH or ESP), algorithms, keys and lifetime.
+- Two-way traffic needs **two SAs**, one in each direction.
+- An SA is identified by three values:
+  - **SPI** (Security Parameters Index, 32 bits), carried in the AH/ESP header;
+  - **destination IP address**;
+  - **security protocol** (AH or ESP).
+- SAs are stored in the **Security Association Database (SAD)**; the rules deciding which traffic gets IPsec are in the **Security Policy Database (SPD)** (general knowledge).
+
+### Transport mode: end-to-end (host-to-host)
+
+- **What it protects:** only the **payload** of the IP packet (TCP/UDP header + data). The **original IP header is kept** and stays readable.
+- **Who uses it:** the two **end hosts** themselves (e.g. a client and a server); both must run IPsec.
+- **Packet layout with ESP:** `Original IP header | ESP header | TCP/UDP + data | ESP trailer | ESP auth`
+- **Packet layout with AH:** `Original IP header | AH | TCP/UDP + data`
+- **What an attacker sees:** the real source and destination IP addresses, but not the ports or data (with ESP).
+- ✅ **True end-to-end security:** protected from the sending host all the way to the receiving host.
+- ✅ Less overhead: no extra IP header is added.
+- ❌ The real IP addresses are visible, so traffic analysis is possible.
+- ❌ Every host must support and be configured for IPsec.
+- **Typical uses:** host-to-host security inside an organisation, client-to-server connections, protecting routing protocols or remote administration (general knowledge).
+
+### Tunnel mode: gateway-to-gateway
+
+- **What it protects:** the **entire original IP packet**, including the original IP header. The whole packet becomes the payload of a **new outer IP packet**.
+- **Who uses it:** **security gateways** (firewalls, routers, VPN servers). Hosts behind the gateways need no IPsec.
+- **Packet layout with ESP:** `New IP header | ESP header | Original IP header | TCP/UDP + data | ESP trailer | ESP auth`
+- **Packet layout with AH:** `New IP header | AH | Original IP header | TCP/UDP + data`
+- **What an attacker sees:** only the **gateway** addresses in the outer header; real internal addresses, ports and data are hidden (with ESP).
+- **Three typical set-ups**
+  - **Gateway-to-gateway (site-to-site VPN):** joins two office networks across the Internet.
+  - **Host-to-gateway (remote-access VPN):** a home worker's laptop connects into the company network.
+  - **Host-to-host through tunnels:** also possible, but transport mode is usually used for that.
+- ✅ Hides internal addresses and network structure.
+- ✅ Only the gateways need IPsec; internal hosts are unchanged.
+- ❌ Not end-to-end: traffic is **unprotected inside each internal network** (between host and gateway).
+- ❌ More overhead: an extra IP header (20 bytes for IPv4) on every packet.
+
+**Transport vs tunnel at a glance**
+
+| | Transport mode | Tunnel mode |
+|---|---|---|
+| Protects | Payload only | Whole original packet |
+| IP header | Original header kept, visible | New outer header added; original hidden |
+| Endpoints | Host ↔ host (end to end) | Gateway ↔ gateway, or host ↔ gateway |
+| Typical use | Client–server, internal host security | VPNs (site-to-site, remote access) |
+| Overhead | Lower | Higher (extra IP header) |
+
+**Further reading:** [IPsec Tunnel and Transport Modes (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ipsec-internet-protocol-security-tunnel-and-transport-modes/) · [What is an IPsec Tunnel? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-an-ipsec-tunnel/) · [IPsec Tunnel Mode vs. Transport Mode (Twingate)](https://www.twingate.com/blog/ipsec-tunnel-mode)
+
+### Authentication Header (AH)
+
+- **Purpose:** **authentication and integrity only, no encryption** (no confidentiality).
+- Provides:
+  - **data integrity:** the packet was not changed in transit;
+  - **data-origin authentication:** the packet really came from the claimed sender;
+  - **anti-replay protection:** via the sequence number.
+- **Protects the whole packet, including the IP header** (except "mutable" fields that change in transit, such as TTL and checksum).
+- **IP protocol number 51** (general knowledge).
+- **Defined in RFC 4302.**
+- **AH header fields** (general knowledge)
+  - Next Header (8 bits): the type of the following payload (e.g. TCP).
+  - Payload Length (8 bits).
+  - Reserved (16 bits).
+  - **SPI** (32 bits): identifies the SA.
+  - **Sequence Number** (32 bits): anti-replay.
+  - **Integrity Check Value (ICV)** (variable): the MAC, e.g. from HMAC.
+- ❌ **Does not work with NAT:** NAT changes the IP addresses, which AH authenticates, so the check fails (general knowledge).
+- ❌ **Deprecated** (lecture): ESP already provides authentication, so AH is kept in IPsecv3 only for backward compatibility.
+
+**Further reading:** [IPsec Protocols (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ipsec-protocols/) · [RFC 4302: IP Authentication Header (RFC Editor)](https://www.rfc-editor.org/rfc/rfc4302)
+
+### Encapsulating Security Payload (ESP)
+
+- **Purpose:** **confidentiality (encryption) + integrity + authentication + anti-replay**; the main IPsec protocol today.
+- Authentication is optional, but encryption and authentication are normally used together.
+- **Does not protect the outer IP header** (unlike AH). In tunnel mode the original header is inside, so it is protected.
+- **IP protocol number 50** (general knowledge).
+- **Defined in RFC 4303.**
+- **ESP packet parts**
+  - **ESP header:** **SPI** (32 bits) + **Sequence Number** (32 bits). *(lecture)*
+  - **Payload data:** the encrypted TCP/UDP segment (transport mode) or the whole original packet (tunnel mode).
+  - **ESP trailer:** **padding** (0–255 bytes, to fill the cipher block size and hide the real length), **Pad Length**, **Next Header**.
+  - **ESP authentication (ICV):** the MAC over the ESP header, payload and trailer.
+- **Typical algorithms** (general knowledge): AES-CBC or AES-GCM for encryption; HMAC-SHA-256 for integrity.
+- ✅ Works with NAT (using NAT traversal, UDP encapsulation on port 4500) (general knowledge).
+
+**AH vs ESP**
+
+| | AH | ESP |
+|---|---|---|
+| Encryption (confidentiality) | ❌ No | ✅ Yes |
+| Integrity and authentication | ✅ Yes | ✅ Yes (optional, usually on) |
+| Anti-replay | ✅ Yes | ✅ Yes |
+| Protects outer IP header | ✅ Yes (immutable fields) | ❌ No |
+| Works through NAT | ❌ No | ✅ Yes (NAT traversal) |
+| IP protocol number | 51 | 50 |
+| RFC | 4302 | 4303 |
+| Status | Deprecated | Main IPsec protocol |
+
+**Further reading:** [Encapsulating Security Payload (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-encapsulating-security-payload/) · [IPsec Protocols (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ipsec-protocols/) · [RFC 4303: IP Encapsulating Security Payload (RFC Editor)](https://www.rfc-editor.org/rfc/rfc4303)
+
+### Internet Key Exchange (IKE)
+
+- **Purpose:** the **key management** part of IPsec. It automatically:
+  - **authenticates** the two peers to each other;
+  - **negotiates** the algorithms (encryption, integrity, Diffie-Hellman group);
+  - **creates the shared secret keys** using **Diffie-Hellman** *(lecture)*;
+  - **sets up and refreshes the Security Associations** used by AH/ESP.
+- Without IKE, keys would have to be configured **manually** on every device (the lecture mentions both manual and automated key exchange).
+- Runs over **UDP port 500** (and **UDP 4500** when NAT traversal is used) (general knowledge).
+- **Versions**
+  - **IKEv1** (RFC 2409), based on the ISAKMP framework, with two phases (general knowledge):
+    - *Phase 1* (Main Mode or Aggressive Mode): builds a secure, authenticated channel between the peers (the IKE SA).
+    - *Phase 2* (Quick Mode): uses that channel to negotiate the IPsec SAs for AH/ESP.
+  - **IKEv2** (RFC 4306 in the lecture; now RFC 7296): simpler, faster and more reliable; the version used with IPsecv3.
+- **IKEv2 exchanges** (general knowledge)
+  1. **IKE_SA_INIT:** agree on algorithms, exchange Diffie-Hellman values and nonces → shared secret.
+  2. **IKE_AUTH:** prove identities (encrypted) and create the first **Child SA** for ESP/AH.
+  3. **CREATE_CHILD_SA:** create more SAs or **re-key** existing ones.
+  4. **INFORMATIONAL:** errors, deleting SAs, keep-alive checks.
+- **How peers authenticate** (general knowledge)
+  - **Pre-shared keys (PSK):** a shared password configured on both sides.
+  - **Digital certificates** (public-key signatures, e.g. RSA).
+  - **EAP** (IKEv2 only): e.g. username/password for remote-access VPN users.
+- ✅ Supports **perfect forward secrecy** with fresh Diffie-Hellman exchanges when re-keying (general knowledge).
+
+**Further reading:** [IP Security (IPSec) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ip-security-ipsec/) · [Applications and Limitations of Diffie-Hellman (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/applications-and-limitations-of-diffie-hellman-algorithm/) · [What is Internet Key Exchange (IKE)? (TechTarget)](https://www.techtarget.com/cybersecurity/definition/What-is-Internet-Key-Exchange-IKE) · [RFC 2409: The Internet Key Exchange (RFC Editor)](https://www.rfc-editor.org/rfc/rfc2409)
+
+### Putting it together: how an IPsec VPN starts
+
+1. Traffic matches a rule in the **SPD** saying it must be protected.
+2. **IKE** authenticates the two gateways, runs **Diffie-Hellman** and creates the keys.
+3. IKE sets up a pair of **SAs** (one per direction), each with its own **SPI**.
+4. Each packet is protected with **ESP** in **tunnel mode** (new outer header between the gateways).
+5. The receiver uses the **SPI** to find the SA, checks the **sequence number** (anti-replay) and the **ICV**, decrypts, and forwards the inner packet.
+6. Before the SA expires, IKE **re-keys** it.
+
+**In conclusion:** IPsec works at the network layer, so it protects all IP traffic transparently. Transport mode gives end-to-end protection of the payload between hosts, and tunnel mode protects whole packets between gateways (VPNs). ESP provides encryption plus authentication and has replaced AH, which only authenticates. IKE does the key management by authenticating peers, running Diffie-Hellman and creating the SAs.
+
 ## Chapter Summary
 
 **What the chapter covered**
@@ -887,5 +1050,35 @@ ESP already provides message authentication as well as encryption, so the authen
 <details><summary>Q16. What are the two fields of the ESP header?</summary>
 
 The **SPI** (32 bits), which identifies the security association, and the **sequence number** (32 bits), which provides anti-replay protection.
+
+</details>
+
+<details><summary>Q17. At which layer is IPsec implemented, and why does that make it transparent to applications?</summary>
+
+The **network layer (Layer 3)**, below TCP/UDP. Applications and transport protocols are unchanged, and all IP traffic (TCP, UDP, ICMP) can be protected.
+
+</details>
+
+<details><summary>Q18. Which mode gives true end-to-end protection, and what does each mode hide from an attacker?</summary>
+
+**Transport mode** (host to host). It hides ports and data but leaves the real IP addresses visible. **Tunnel mode** (gateway to gateway) hides the whole original packet, including internal addresses. It is not end-to-end, though, because traffic inside each LAN is unprotected.
+
+</details>
+
+<details><summary>Q19. Compare AH and ESP: encryption, outer IP header, NAT, protocol number.</summary>
+
+AH: no encryption, authenticates the IP header too, breaks with NAT, protocol 51, deprecated. ESP: encryption + authentication, does not protect the outer header, works with NAT traversal, protocol 50.
+
+</details>
+
+<details><summary>Q20. What does IKE do, and what are the four IKEv2 exchanges?</summary>
+
+It authenticates the peers, negotiates algorithms, creates keys with **Diffie-Hellman** and sets up and re-keys the **SAs** (UDP 500/4500). Exchanges: **IKE_SA_INIT**, **IKE_AUTH**, **CREATE_CHILD_SA**, **INFORMATIONAL**.
+
+</details>
+
+<details><summary>Q21. What is a Security Association and how is it identified?</summary>
+
+A **one-way** agreement on the protocol, algorithms and keys (two-way traffic needs two SAs). It is identified by the **SPI**, the **destination IP address** and the **security protocol** (AH or ESP).
 
 </details>
