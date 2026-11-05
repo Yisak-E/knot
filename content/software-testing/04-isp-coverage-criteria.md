@@ -7,91 +7,233 @@ sort: 4
 
 ## Choosing Combinations of Blocks
 
-Step 4 of input domain modeling answers a question that Part 1 left open: once every characteristic has been partitioned into blocks, how should blocks from different characteristics be combined into tests? A single test might need, for example, block 1 of one characteristic and block 3 of another. The obvious answer is to try every combination, but that quickly becomes impractical once more than two or three partitions are defined. Coverage criteria solve this problem by choosing combinations selectively. Each abstract test starts by combining one block from each characteristic, and concrete values are then chosen to satisfy that combination.
+**The question (Step 4 of IDM):** once every characteristic is partitioned into blocks, how should blocks from different characteristics be combined into tests?
 
-Throughout this chapter, Q is the number of characteristics and Bi is the number of blocks in characteristic i. A running example is used to compare the criteria: four characteristics A = [a1, a2], B = [b1, b2], C = [c1, c2, c3] and D = [d1, d2]. These could describe students, for instance, by level (graduate or undergraduate), mode (full-time or part-time), major (CS, SWE or other) and classification (in-state or out-of-state). A smaller example with three characteristics, [A, B], [1, 2, 3] and [x, y], is also used.
+- A single test may need, e.g., block 1 of one characteristic and block 3 of another.
+- Trying **every** combination quickly becomes impractical beyond two or three partitions.
+- Coverage criteria choose combinations **selectively**.
+- Each abstract test combines **one block from each characteristic**; concrete values are then chosen to satisfy it.
 
-In conclusion, coverage criteria give the tester a principled rule for deciding which block combinations to test, instead of facing an exponential number of possibilities.
+**Notation**
+- **Q** = number of characteristics; **Bi** = number of blocks in characteristic i.
+
+**Running example** (used to compare all criteria)
+- Four characteristics: A = [a1, a2], B = [b1, b2], C = [c1, c2, c3], D = [d1, d2].
+- Could describe students: level (graduate/undergraduate), mode (full-time/part-time), major (CS/SWE/other), classification (in-state/out-of-state).
+- Smaller example: three characteristics [A, B], [1, 2, 3], [x, y].
+
+**In conclusion:** coverage criteria give the tester a principled rule for choosing which block combinations to test, instead of an exponential number of possibilities.
 
 ## All Combinations Coverage (ACoC)
 
-All Combinations Coverage requires every combination of blocks from all characteristics to be used. The number of tests is the product of the block counts, B1 × B2 × … × BQ. In set terms, an ACoC test set is the Cartesian product of the block sets, because every block of each characteristic is combined with every block of every other characteristic exactly once. For [A, B] × [1, 2, 3] × [x, y], ACoC needs 2 × 3 × 2 = 12 tests, from (A, 1, x) and (A, 1, y) through to (B, 3, x) and (B, 3, y). Three characteristics with 4, 2 and 3 blocks need 24 tests, the running student example needs 2 × 2 × 3 × 2 = 24 tests, and triang() with four blocks per side needs 4 × 4 × 4 = 64 tests.
+**Definition:** every combination of blocks from all characteristics is used.
 
-ACoC is thorough, it reveals hidden bugs that depend on interactions, and it improves test quality. However, it does not scale, it is resource intensive and it creates redundancy. For a pizza-ordering function with size (3 blocks), crust (2), receiving method (2) and payment (3), ACoC already needs 3 × 2 × 2 × 3 = 36 tests, and adding a toppings characteristic with 3 blocks triples that to 108.
+- **Number of tests:** B1 × B2 × … × BQ (the Cartesian product of the block sets).
 
-In conclusion, ACoC is the strongest criterion but also the most expensive, so it is practical only when the input space is small and the tests are automated.
+**Examples**
+- [A, B] × [1, 2, 3] × [x, y] → 2 × 3 × 2 = **12** tests, from (A, 1, x), (A, 1, y) … to (B, 3, x), (B, 3, y).
+- Characteristics with 4, 2 and 3 blocks → **24** tests.
+- Running student example → 2 × 2 × 3 × 2 = **24**.
+- `triang()` with four blocks per side → 4 × 4 × 4 = **64**.
+- Pizza ordering: size (3), crust (2), receiving method (2), payment (3) → 3 × 2 × 2 × 3 = **36**; adding toppings (3 blocks) triples it to **108**.
+
+**Pros and cons**
+- ✅ Thorough; reveals hidden bugs that depend on interactions; improves test quality.
+- ❌ Does not scale; resource intensive; creates redundancy.
+
+**In conclusion:** ACoC is the strongest criterion but also the most expensive, practical only when the input space is small and tests are automated.
 
 ## Each Choice Coverage (ECC)
 
-Each Choice Coverage is the weakest and lightest criterion. It requires that one value from each block of each characteristic is used in at least one test. The number of tests needed is the maximum of the Bi, the block count of the largest characteristic. For the running example this is max(2, 2, 3, 2) = 3 tests, for instance (a1, b1, c1, d1), (a2, b2, c2, d2) and (a1, b1, c3, d1). The third test may reuse any blocks for A, B and D, because characteristic C, with three blocks, is the one that decides the count.
+**Definition:** the weakest and lightest criterion — one value from **each block of each characteristic** is used in at least one test.
 
-ECC is simple, needs few tests and guarantees that every block is tested at least once. Its main weakness is that it does not test interactions between parameters, so it may miss bugs that need specific combinations. For example, suppose a pizza ordering system crashes whenever a customer pays online and chooses delivery. A valid ECC set such as (small, thin, pickup, cash), (medium, thick, delivery, card) and (large, thin, pickup, online) never pairs online payment with delivery, so the bug is missed. ECC is best used for a quick, lightweight design when time is limited, or as a baseline before stronger criteria such as pair-wise or base choice coverage.
+- **Number of tests:** max(Bi), the block count of the largest characteristic.
+- **Running example:** max(2, 2, 3, 2) = **3** tests, e.g. (a1, b1, c1, d1), (a2, b2, c2, d2), (a1, b1, c3, d1).
+  - The third test may reuse any blocks for A, B and D, because C (3 blocks) decides the count.
 
-In conclusion, ECC makes sure no block is ignored, but because it never requires combinations, it should be treated as a minimum rather than a complete strategy.
+**Pros and cons**
+- ✅ Simple; few tests; guarantees every block is tested at least once.
+- ❌ **Does not test interactions** between parameters, so it may miss bugs that need specific combinations.
+
+**Example of a missed bug (pizza ordering)**
+- Bug: the system crashes when a customer **pays online and chooses delivery**.
+- A valid ECC set: (small, thin, pickup, cash), (medium, thick, delivery, card), (large, thin, pickup, online).
+- It never pairs online payment with delivery → **bug missed**.
+
+**When to use:** a quick, lightweight design when time is limited, or as a baseline before stronger criteria such as pair-wise or base choice.
+
+**In conclusion:** ECC makes sure no block is ignored, but since it never requires combinations, treat it as a minimum rather than a complete strategy.
 
 ## Pair-Wise Coverage (PWC)
 
-Pair-Wise Coverage addresses ECC's weakness by explicitly requiring combinations. A value from each block of each characteristic must be combined with a value from every block of every other characteristic. The number of pairs to cover is the sum of Bi × Bj over every pair of characteristics. For [A, B], [1, 2, 3] and [x, y], there are 6 + 4 + 6 = 16 pairs. The minimum number of tests is at least the product of the two largest block counts, here 3 × 2 = 6. One valid set is (A, 1, x), (A, 2, x), (A, 3, y), (B, 1, y), (B, 2, y) and (B, 3, x). Each test covers several pairs at once: with three characteristics, a test such as (A, 1, x) covers the three pairs (A, 1), (A, x) and (1, x). Several different test sets can satisfy PWC.
+**Definition:** a value from each block of each characteristic must be combined with a value from **every block of every other characteristic** (fixes ECC's weakness).
 
-As another example, a web app tested on browser (Chrome, Firefox, Safari), operating system (Windows, macOS) and network (WiFi, 4G) has 6 + 6 + 4 = 16 pairs and needs at least 3 × 2 = 6 tests. Adding a language characteristic (English, Arabic) raises the number of pairs to 30, but the minimum stays at 6 because the two largest characteristics are unchanged.
+- **Pairs to cover:** the sum of Bi × Bj over every pair of characteristics.
+- **Minimum number of tests:** at least the product of the **two largest** block counts.
+- Each test covers several pairs at once (a test such as (A, 1, x) covers (A, 1), (A, x) and (1, x)).
+- Several different test sets can satisfy PWC.
 
-In conclusion, PWC catches faults caused by any two interacting inputs while needing far fewer tests than ACoC.
+**Example: [A, B], [1, 2, 3], [x, y]**
+- Pairs: 6 + 4 + 6 = **16**.
+- Minimum tests: 3 × 2 = **6**.
+- One valid set: (A, 1, x), (A, 2, x), (A, 3, y), (B, 1, y), (B, 2, y), (B, 3, x).
+
+**Example: web app** — browser (Chrome, Firefox, Safari), OS (Windows, macOS), network (WiFi, 4G)
+- Pairs: 6 + 6 + 4 = **16**; minimum tests: 3 × 2 = **6**.
+- Add language (English, Arabic) → **30** pairs, but the minimum stays **6** (two largest characteristics unchanged).
+
+**In conclusion:** PWC catches faults caused by any two interacting inputs with far fewer tests than ACoC.
 
 ## T-Wise Coverage (TWC)
 
-T-Wise Coverage extends pair-wise coverage to groups of T characteristics: a value from each block of each group of T characteristics must be combined. PWC is the special case where T = 2, and when T equals the number of characteristics Q, TWC becomes the same as ACoC. The minimum number of tests is determined by mathematical results called covering arrays, and tools such as Microsoft PICT and NIST ACTS can generate them. Simple counting arguments only give a lower bound. For example, four binary parameters have 24 pairs and each test covers 6 of them, which suggests 4 tests, but the true minimum is 5. For Q binary parameters, the number of T-tuples to cover is the number of ways to choose T parameters multiplied by 2 to the power T; for four binary parameters, that is 8 for T = 1, 24 for T = 2, 32 for T = 3 and 16 for T = 4.
+**Definition:** extends pair-wise to groups of **T** characteristics — a value from each block of each group of T characteristics must be combined.
 
-In conclusion, TWC lets the tester raise the strength of interaction testing step by step, with ACoC as its upper limit.
+- **T = 2** → PWC.
+- **T = Q** (all characteristics) → same as ACoC.
+- The minimum number of tests comes from **covering arrays**; tools such as **Microsoft PICT** and **NIST ACTS** generate them.
+- Simple counting only gives a **lower bound**.
+  - Four binary parameters: 24 pairs, each test covers 6 → suggests 4 tests, but the true minimum is **5**.
+
+**Number of T-tuples to cover for Q binary parameters:** (ways to choose T parameters) × 2ᵀ.
+
+| T (four binary parameters) | Tuples to cover |
+|---|---|
+| 1 | 8 |
+| 2 | 24 |
+| 3 | 32 |
+| 4 | 16 |
+
+**In conclusion:** TWC lets the tester raise the strength of interaction testing step by step, with ACoC as its upper limit.
 
 ## Base Choice Coverage (BCC)
 
-Base Choice Coverage recognises that some blocks are more important than others and brings domain knowledge into the choice of tests. The tester first chooses one base block for each characteristic and combines all the base blocks into a base test. Further tests are then created by holding every characteristic at its base block except one, and replacing that one with each of its non-base blocks in turn. The number of tests is 1 + Σ(Bi − 1). For [A, B], [1, 2, 3] and [x, y] with base (A, 1, x), BCC gives 1 + (1 + 2 + 1) = 5 tests: the base test (A, 1, x), then (B, 1, x), (A, 2, x), (A, 3, x) and (A, 1, y). For the running example with base (a1, b1, c1, d1), it gives 1 + 1 + 1 + 2 + 1 = 6 tests, and for triang() with four blocks per side it gives 1 + 3 + 3 + 3 = 10 tests.
+**Definition:** recognises that some blocks are more important than others and uses **domain knowledge** to choose tests.
 
-The base test must be feasible, meaning all the base choices are compatible and form a valid, executable test, such as three sides that really form a triangle. Common choices for a base are the end-user view, the simplest or smallest value, the first value in some ordering, or the happy path. If the base choices are valid and the other blocks invalid, BCC naturally produces stress tests that expose robustness problems, and the tester should document why each base was chosen. A poor base can ruin the test set. For a shippingCost() function with weight (light, medium, heavy, over the limit), destination (local, domestic, international) and speed (standard, express), a sensible base is (medium, domestic, standard), which gives 1 + 3 + 2 + 1 = 7 tests. If "over the limit" were chosen as the base weight, every test would hit the same rejection error and never exercise the pricing logic.
+**How it works**
+1. Choose **one base block** for each characteristic.
+2. Combine all base blocks into the **base test**.
+3. Create further tests by holding every characteristic at its base block **except one**, replacing that one with each of its non-base blocks in turn.
 
-BCC uses domain knowledge, needs far fewer tests than ACoC, tests interactions around key scenarios and is easy to apply. Its disadvantages are that it depends on the tester's choice of base, it may miss important combinations, and the base test must be feasible.
+- **Number of tests:** 1 + Σ(Bi − 1).
 
-In conclusion, BCC focuses testing around the most important scenario and varies one input at a time, which makes it efficient and well suited to robustness testing.
+**Examples**
+- [A, B], [1, 2, 3], [x, y] with base (A, 1, x) → 1 + (1 + 2 + 1) = **5** tests: (A, 1, x), (B, 1, x), (A, 2, x), (A, 3, x), (A, 1, y).
+- Running example with base (a1, b1, c1, d1) → 1 + 1 + 1 + 2 + 1 = **6**.
+- `triang()` with four blocks per side → 1 + 3 + 3 + 3 = **10**.
+
+**The base test**
+- Must be **feasible**: all base choices compatible, forming a valid executable test (e.g. three sides that really form a triangle).
+- Common base choices: end-user view, simplest/smallest value, first value in some ordering, the **happy path**.
+- If base choices are valid and the other blocks invalid, BCC naturally produces **stress tests** that expose robustness problems.
+- Document why each base was chosen.
+
+**A poor base ruins the test set — `shippingCost()`**
+- Weight (light, medium, heavy, over the limit), destination (local, domestic, international), speed (standard, express).
+- Good base: (medium, domestic, standard) → 1 + 3 + 2 + 1 = **7** tests.
+- Bad base: "over the limit" weight → every test hits the same rejection error and never exercises the pricing logic.
+
+**Pros and cons**
+- ✅ Uses domain knowledge; far fewer tests than ACoC; tests interactions around key scenarios; easy to apply.
+- ❌ Depends on the tester's choice of base; may miss important combinations; base test must be feasible.
+
+**In conclusion:** BCC focuses testing on the most important scenario and varies one input at a time — efficient and well suited to robustness testing.
 
 ## Multiple Base Choice Coverage (MBCC)
 
-Sometimes a characteristic has more than one logical base choice. Multiple Base Choice Coverage allows one or more base blocks per characteristic. A base test is formed for every combination of base choices, and for each base test, one characteristic at a time is varied over its non-base blocks. The number of tests is M + Σ M × (Bi − mi), where M is the number of base tests (the product of the mi) and mi is the number of base blocks in characteristic i.
+**Definition:** allows **one or more base blocks per characteristic** when there is more than one logical base choice.
 
-For triang(), each side has Bi = 4 blocks. Suppose side 1 has two base choices, greater than 1 and equal to 1, so m1 = 2, while sides 2 and 3 have one base choice each, greater than 1. Then M = 2 × 1 × 1 = 2, and the base tests are (2, 2, 2) and (1, 2, 2). Varying side 1 gives 2 × (4 − 2) = 4 tests, varying side 2 gives 2 × (4 − 1) = 6 tests and varying side 3 gives 2 × (4 − 1) = 6 tests, for a total of 2 + 4 + 6 + 6 = 18. However, varying side 1 to 0 and to −1 from both base tests produces (0, 2, 2) and (−1, 2, 2) twice, so only 16 tests are unique. Duplicates appear whenever two base tests differ only in the characteristic being varied, which is why the formula is an upper bound.
+- A base test is formed for **every combination of base choices**; for each base test, one characteristic at a time is varied over its non-base blocks.
+- **Number of tests:** M + Σ M × (Bi − mi), where M = number of base tests (the product of the mi) and mi = number of base blocks in characteristic i.
 
-In conclusion, MBCC generalises BCC to several important scenarios, but the tester should remove duplicate tests that the formula counts twice.
+**Example: `triang()`** (each side has Bi = 4 blocks)
+- Side 1 has two base choices (greater than 1, equal to 1) → m1 = 2; sides 2 and 3 have one base choice each (greater than 1).
+- M = 2 × 1 × 1 = **2** base tests: (2, 2, 2) and (1, 2, 2).
+- Vary side 1: 2 × (4 − 2) = 4 tests.
+- Vary side 2: 2 × (4 − 1) = 6 tests.
+- Vary side 3: 2 × (4 − 1) = 6 tests.
+- Total: 2 + 4 + 6 + 6 = **18**.
+
+**Duplicates**
+- Varying side 1 to 0 and to −1 from both base tests produces (0, 2, 2) and (−1, 2, 2) **twice** → only **16 unique** tests.
+- Duplicates appear whenever two base tests differ only in the characteristic being varied, so the formula is an **upper bound**.
+
+**In conclusion:** MBCC generalises BCC to several important scenarios, but the tester should remove duplicates the formula counts twice.
 
 ## Subsumption Among the Criteria
 
-A criterion C1 subsumes a criterion C2 when every test set that satisfies C1 also satisfies C2. ACoC subsumes every other criterion, and every criterion subsumes ECC. There are two chains: ACoC subsumes TWC, which subsumes PWC, which subsumes ECC; and ACoC subsumes MBCC, which subsumes BCC, which subsumes ECC. PWC and BCC are not comparable. The six-test PWC set for [A, B], [1, 2, 3], [x, y] does not satisfy BCC, because for any candidate base the required single-variation tests are missing. The five-test BCC set does not satisfy PWC, because it never covers the pair (B, y).
+**Definition:** C1 subsumes C2 when every test set that satisfies C1 also satisfies C2.
 
-In conclusion, subsumption shows which criteria are strictly stronger, but stronger is not always better, because the stronger criteria cost more tests.
+**The hierarchy**
+- **ACoC subsumes every other criterion.**
+- **Every criterion subsumes ECC.**
+- Two chains:
+  - ACoC → TWC → PWC → ECC
+  - ACoC → MBCC → BCC → ECC
+- **PWC and BCC are not comparable:**
+  - The six-test PWC set for [A, B], [1, 2, 3], [x, y] does **not** satisfy BCC (for any candidate base, the required single-variation tests are missing).
+  - The five-test BCC set does **not** satisfy PWC (it never covers the pair (B, y)).
+
+**In conclusion:** subsumption shows which criteria are strictly stronger, but stronger is not always better because stronger criteria cost more tests.
 
 ## Comparing the Cost of the Criteria
 
-For the running example A = [a1, a2], B = [b1, b2], C = [c1, c2, c3], D = [d1, d2], ECC needs 3 tests and tests no interactions, BCC needs 6 tests and varies one input at a time around a base, PWC needs at least 6 tests and covers every pair, and ACoC needs 24 tests and covers every combination. For the pizza model, the counts are 3 for ECC, 7 for BCC, at least 9 for PWC and 36 for ACoC.
+| Criterion | Running example (A=2, B=2, C=3, D=2) | Pizza model (3, 2, 2, 3) | What it covers |
+|---|---|---|---|
+| ECC | 3 | 3 | Every block once; no interactions |
+| BCC | 6 | 7 | One input varied at a time around a base |
+| PWC | at least 6 | at least 9 | Every pair |
+| ACoC | 24 | 36 | Every combination |
 
-The right criterion depends on the project. A prototype demo next week may only need ECC, possibly with BCC on the happy path. A safety-critical system such as a medication dose calculator should use the strongest affordable criterion: ACoC if the space is small, otherwise PWC or a higher T. A checkout page used by millions of customers would suit PWC or BCC/MBCC focused on the main flows, with automation. ACoC is acceptable when the space is small and the tests are automated, but it stops being practical as characteristics are added, because the count multiplies.
+**Choosing the right criterion depends on the project**
+- Prototype demo next week → ECC, possibly BCC on the happy path.
+- Safety-critical system (e.g. medication dose calculator) → the strongest affordable criterion: ACoC if the space is small, otherwise PWC or a higher T.
+- Checkout page used by millions → PWC, or BCC/MBCC focused on the main flows, with automation.
+- ACoC is acceptable when the space is small and tests are automated, but stops being practical as characteristics are added (the count multiplies).
 
-In conclusion, choosing a criterion is a trade-off between thoroughness and cost, and the tester should match the criterion to the risk of the software.
+**In conclusion:** choosing a criterion is a trade-off between thoroughness and cost; match the criterion to the risk of the software.
 
 ## Constraints Among Characteristics
 
-Some combinations of blocks are infeasible, and these constraints must be documented in the IDM, either as a list of invalid block pairs or as a set of inequalities. For example, a "less than zero" side length cannot be combined with a valid triangle. There are two types of constraint. A "cannot be combined" constraint says that a block of one characteristic cannot go with a specific block of another; for example, a child user account cannot access R-rated content. A "can only be combined" constraint says that a block can go only with a specific block of another; for example, an Enterprise licence always comes with dedicated support. The two forms are interchangeable: "the Free plan can only be combined with ads" is the same rule as "the Free plan cannot be combined with no ads".
+**Why constraints:** some combinations of blocks are **infeasible**. They must be documented in the IDM, either as a list of invalid block pairs or as a set of inequalities (e.g. a "less than zero" side length cannot be combined with a valid triangle).
 
-The findElement() example shows constraints in practice. If characteristic A describes the list's length and contents (one element; more than one, unsorted; more than one, sorted; more than one, all identical) and characteristic B describes the match (not found; found once; found more than once), then two combinations are infeasible. A one-element list cannot contain the element more than once, and a list of several identical elements cannot contain the element exactly once.
+**Two types of constraint**
+- **"Cannot be combined":** a block of one characteristic cannot go with a specific block of another.
+  - Example: a child user account cannot access R-rated content.
+- **"Can only be combined":** a block can go only with a specific block of another.
+  - Example: an Enterprise licence always comes with dedicated support.
+- The two forms are interchangeable: "the Free plan can only be combined with ads" = "the Free plan cannot be combined with no ads".
 
-How constraints are handled depends on the criterion. For ACoC, PWC and TWC, the infeasible combinations are simply dropped. If PWC requires an infeasible pair, no rework by the tester can make it feasible, because the pair can never appear in a valid test. For BCC and MBCC, the tester changes a value to another non-base block to find a feasible combination, because these criteria only need each non-base block to appear in some test close to the base.
+**Example: `findElement()`**
+- Characteristic A (list length and contents): one element; more than one, unsorted; more than one, sorted; more than one, all identical.
+- Characteristic B (match): not found; found once; found more than once.
+- Two infeasible combinations:
+  - A one-element list cannot contain the element more than once.
+  - A list of several identical elements cannot contain the element exactly once.
 
-Consider a streaming service with plan (Free, Standard, Premium), ads (with ads, no ads) and quality (SD, HD, 4K), where the Free plan always shows ads and cannot stream in 4K. ACoC has 18 combinations, of which 4 are infeasible (3 with Free and no ads, 2 with Free and 4K, minus 1 counted twice), leaving 14. PWC has 21 pairs, of which 2 must be dropped, leaving 19. A BCC set with base (Free, with ads, SD) varies the plan to Standard and Premium, repairs the infeasible variant (Free, no ads, SD) as (Standard, no ads, SD), keeps (Free, with ads, HD) and repairs (Free, with ads, 4K) as (Standard, with ads, 4K), giving 6 tests.
+**How each criterion handles constraints**
+- **ACoC, PWC, TWC:** infeasible combinations are simply **dropped**. If PWC requires an infeasible pair, no rework can make it feasible (the pair can never appear in a valid test).
+- **BCC, MBCC:** the tester **changes a value to another non-base block** to find a feasible combination, since these criteria only need each non-base block to appear in some test close to the base.
 
-In conclusion, constraints must be recorded in the IDM so the tester can drop infeasible combinations under ACoC, PWC and TWC and repair them under BCC and MBCC.
+**Example: streaming service** — plan (Free, Standard, Premium), ads (with ads, no ads), quality (SD, HD, 4K); Free always shows ads and cannot stream in 4K.
+- **ACoC:** 18 combinations; 4 infeasible (3 with Free + no ads, 2 with Free + 4K, minus 1 counted twice) → **14** remain.
+- **PWC:** 21 pairs; 2 must be dropped → **19** remain.
+- **BCC** with base (Free, with ads, SD):
+  - Vary plan to Standard and Premium.
+  - Repair infeasible (Free, no ads, SD) as (Standard, no ads, SD).
+  - Keep (Free, with ads, HD).
+  - Repair (Free, with ads, 4K) as (Standard, with ads, 4K).
+  - Result: **6** tests.
+
+**In conclusion:** record constraints in the IDM so infeasible combinations are dropped under ACoC, PWC and TWC and repaired under BCC and MBCC.
 
 ## Summary: Why Input Space Partitioning Is Widely Used
 
-Input space partitioning is fairly easy to apply, even with no automation. It offers convenient ways to add more or less testing simply by changing the criterion. It is applicable at all levels: unit, class, integration and system. It is based only on the input space, not the implementation.
+- Fairly easy to apply, even with **no automation**.
+- Easy to add more or less testing by simply **changing the criterion**.
+- Applicable at **all levels**: unit, class, integration, system.
+- Based only on the **input space**, not the implementation.
 
-In conclusion, input space partitioning is simple, straightforward, effective and widely used, and the combination criteria in this chapter give the tester full control over how much testing to do.
+**In conclusion:** input space partitioning is simple, straightforward, effective and widely used, and the combination criteria give the tester full control over how much testing to do.
 
 ## Self-test
 

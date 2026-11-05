@@ -14,16 +14,17 @@ When the user shares lecture slides or handouts and asks for notes:
 2. Create `content/<subject-slug>/_subject.md` (title, code, description, color, sort) if the subject is new.
 3. Write notes as numbered files, following the style of `content/software-testing/`:
    - Front matter: `title`, `summary`, `tags: [..]`, `sort`.
-   - **Chapter notes are flowing prose (the user's chosen format).** Each topic is a `## Topic Title` heading,
-     then an introductory paragraph that defines the idea, explanatory paragraphs that weave the worked examples
-     into sentences ("For example, …", "In contrast, …"), and a final paragraph starting "In conclusion, …".
-     No bullet lists or tables in chapter notes, and no LaTeX (write maths in plain text, e.g. 3 × 2 = 6).
+   - **Chapter notes are structured bullet notes (the user's chosen format since Nov 5).** Each topic is a
+     `## Topic Title` heading, then a bold **Definition:** line, short bold sub-headings (e.g. **How it works**,
+     **Advantages**, **Disadvantages**, **Example: …**) with bullets or numbered steps under each, ✅/❌ for
+     pros/cons, small comparison tables where several items share the same attributes, and a closing
+     **In conclusion:** line. No LaTeX (write maths in plain text, e.g. 3 × 2 = 6).
      Short code blocks are fine where the code itself is the example.
    - End each chapter note with a `## Self-test` section of `<details><summary>Question</summary>` blocks, leaving a
      blank line after `<summary>…</summary>` and before `</details>` so the markdown inside renders.
-   - Exception: when the user explicitly asks for bullet notes or reference links for a topic (e.g. the RFC 822 /
-     SMTP / MIME / Radix-64 section in `information-security/08-…`), write that section as bullets and add a
-     "Further reading" link line per topic. Keep the rest of the chapter in prose.
+   - When the user asks for reference links, add a "Further reading" line per topic pointing to text-based
+     articles (GeeksforGeeks first, then Wikipedia or the RFC), as in the RFC 822 / SMTP / MIME / Radix-64
+     section of `information-security/08-…`.
    - The cheat-sheet and practice-questions notes stay as compact lists and tables, since they are for quick revision.
 4. Check facts and arithmetic against the source; label anything not in the source (e.g. "sample solution").
 5. Commit as the user. Every commit must be authored by Yisak-E:
