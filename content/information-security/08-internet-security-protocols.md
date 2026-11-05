@@ -167,6 +167,170 @@ For signing, the default algorithms listed on the slide are RSA with SHA-1, and 
 
 In conclusion, MIME lets email carry rich content, and S/MIME adds signatures and encryption by combining a private-key signature, a symmetric session key and the recipient's public key, with base64 encoding for safe transport.
 
+## Email Standards in Detail: RFC 822, SMTP, MIME and Radix-64
+
+*Quick-revision bullet notes. Each topic ends with text-based reference articles (GeeksforGeeks and others) for more detail.*
+
+### RFC 822: the Internet text message format
+
+**What it is**
+- "Standard for the Format of ARPA Internet Text Messages", published in **1982**.
+- Defines the **format of an email message**, not how it is sent (sending is SMTP's job).
+- Later updated by **RFC 2822** (2001) and **RFC 5322** (2008), which are still based on it.
+
+**Properties**
+- A message = **envelope** + **contents**.
+  - Envelope: the information needed for transmission and delivery (used by SMTP).
+  - Contents: the object to be delivered = **header lines** + **a blank line** + **body**.
+- Each header line has the form **`Keyword: value`**, e.g. `From:`, `To:`, `Cc:`, `Bcc:`, `Subject:`, `Date:`, `Reply-To:`, `Message-ID:`, `Received:`.
+- A header can continue onto the next line if that line starts with whitespace (folding).
+- The body is **plain US-ASCII text** only (7-bit characters).
+- Lines end with **CRLF**.
+- Defines the standard address syntax, e.g. `user@domain`.
+
+**Advantages**
+- **Simple**: plain text, easy for people to read and write.
+- **Easy to parse and implement**, so it was adopted universally.
+- **Standard headers** give consistent routing and basic information (sender, recipients, subject, date).
+- **Extensible**: new header fields can be added, which is how MIME was later built on top of it.
+
+**Disadvantages and limitations**
+- ❌ **No attachment support**: it cannot carry executable files or other binary objects.
+- ❌ **ASCII only**: no national-language characters (8-bit codes such as Arabic, Chinese or accented letters).
+- ❌ **No multimedia**: no images, audio or video; text only.
+- ❌ **No structure in the body**: a message cannot contain several parts.
+- ❌ **No security**: no encryption, no integrity check, and the `From:` field can be forged (spoofing).
+- ❌ Problems in transit with SMTP:
+  - servers may reject mail over a certain size;
+  - gateways translating between ASCII and EBCDIC use inconsistent mappings;
+  - gateways to X.400 networks cannot handle non-text data;
+  - some SMTP implementations alter messages: adding or removing CR/LF, wrapping or truncating lines longer than 76 characters, removing trailing whitespace, padding lines to the same length, and converting tabs into spaces.
+- ➡️ These limitations are exactly why **MIME** was created.
+
+**Further reading:** [RFC 822 full text (RFC Editor)](https://www.rfc-editor.org/rfc/rfc822) · [RFC 822 at W3C](https://w3.org/Protocols/rfc822) · [Working of Email (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/working-of-email/)
+
+### SMTP: Simple Mail Transfer Protocol
+
+**What it is**
+- The application-layer protocol that **sends and relays email** between mail servers.
+- Defined in **RFC 821** (1982), now **RFC 5321**.
+- Runs over **TCP**, so delivery is reliable and connection-oriented.
+- It is a **push protocol**: it pushes mail from the sender toward the receiver's server. It **cannot fetch mail**, so users read mail with **POP3** or **IMAP**.
+
+**Ports**
+- **25**: server-to-server relay.
+- **587**: mail submission from a client, usually upgraded to TLS with **STARTTLS**.
+- **465**: SMTPS (SMTP over implicit TLS).
+
+**Components (the mail path)**
+- **MUA (Mail User Agent)**: the email client, e.g. Outlook or Gmail, where you write and read mail.
+- **MSA (Mail Submission Agent)**: accepts mail from the MUA.
+- **MTA (Mail Transfer Agent)**: relays mail between servers using SMTP.
+- **MDA (Mail Delivery Agent)**: stores the mail in the recipient's mailbox.
+- Path: sender MUA → (SMTP) → sender's server → (SMTP) → receiver's server → (POP3/IMAP) → receiver MUA.
+
+**How a session works (three phases)**
+1. **Connection establishment**: TCP connection, server replies `220` (ready), client says `HELO` or `EHLO` (extended SMTP).
+2. **Mail transfer**:
+   - `MAIL FROM:<sender>` gives the envelope sender.
+   - `RCPT TO:<recipient>` gives each recipient (one command per recipient).
+   - `DATA`, then the server replies `354`; the client sends the RFC 822 message (headers + blank line + body) and ends it with a line containing only `.`.
+   - The server replies `250 OK`.
+3. **Connection termination**: `QUIT`, and the server replies `221` and closes.
+- Other commands: `RSET` (reset), `VRFY` (verify an address), `NOOP` (no operation), `HELP`.
+- Replies are **3-digit codes**: 2xx success, 3xx more input needed, 4xx temporary failure, 5xx permanent failure.
+
+**Properties**
+- Text-based commands and replies, so it is human-readable.
+- Classic SMTP carries only **7-bit ASCII** data, matching RFC 822.
+- Uses the **envelope** (MAIL FROM / RCPT TO) separately from the message headers (From: / To:).
+
+**Limitations**
+- ❌ Cannot carry binary data or non-ASCII text without MIME encoding.
+- ❌ **No built-in security**: originally no encryption and no sender authentication, which allows **spoofing** and **spam**.
+  - Fixes are extensions: **STARTTLS** (encryption), **SMTP-AUTH** (login), plus SPF, DKIM and DMARC (sender verification).
+- ❌ Some servers limit message size.
+- ❌ Push-only: a separate protocol is needed to retrieve mail.
+
+**Further reading:** [Simple Mail Transfer Protocol (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/simple-mail-transfer-protocol-smtp/) · [SMTP Commands (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/smtp-commands/) · [IMAP vs POP3 vs SMTP (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/imap-vs-pop3-vs-smtp/)
+
+### MIME: Multipurpose Internet Mail Extensions
+
+**What it is**
+- An **extension of RFC 822** that fixes its limitations, defined in **RFC 2045–2049** (1996).
+- Lets email carry **non-ASCII text, attachments, images, audio, video and multi-part messages**.
+- It is **compatible with RFC 822 and SMTP**: it converts everything into 7-bit ASCII-safe text before sending, so old servers still work.
+
+**Properties: the five new header fields**
+- **`MIME-Version`**: must be `1.0`; shows that the message follows MIME.
+- **`Content-Type`**: the type and subtype of the data, e.g. `text/plain`, `image/jpeg`, `application/pdf`.
+- **`Content-Transfer-Encoding`**: how the body was encoded for transport, e.g. `base64`.
+- **`Content-ID`**: a unique identifier for a body part (used to reference it, e.g. an inline image).
+- **`Content-Description`**: a plain-text description of the object, e.g. "Photo of the lab".
+- (Also commonly used: **`Content-Disposition`**, which says whether a part is shown inline or as an attachment, with a filename.)
+
+**Properties: the seven content types**
+- **text**: `plain`, `enriched`, `html`; character sets other than ASCII are allowed.
+- **multipart**: several parts separated by a **boundary** string.
+  - `mixed`: independent parts in order (body + attachments).
+  - `parallel`: parts with no order.
+  - `alternative`: the same content in different formats (e.g. plain text and HTML); the client shows the best one.
+  - `digest`: each part is itself an RFC 822 message.
+- **message**: `rfc822` (an encapsulated email), `partial` (a large message fragmented into pieces, reassembled transparently for the recipient), `external-body` (a pointer to data stored elsewhere).
+- **image**: `jpeg`, `gif`.
+- **video**: `mpeg`.
+- **audio**: `basic`.
+- **application**: `postscript`, `octet-stream` (generic binary), and others such as `pdf`.
+
+**Properties: transfer encodings**
+- **7bit**: short lines of ASCII; no encoding needed (the default).
+- **8bit**: short lines that may contain non-ASCII characters.
+- **binary**: any data, any line length (not safe over classic SMTP).
+- **quoted-printable**: mostly-ASCII text stays readable; only special bytes become `=XX` in hex (e.g. `=E9` for é).
+- **base64 (radix-64)**: any binary data becomes ASCII-safe text (see below).
+- **x-token**: a non-standard, named encoding.
+
+**Further reading:** [MIME Protocol (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/multipurpose-internet-mail-extension-mime-protocol/) · [MIME Media Types (GeeksforGeeks)](https://www.geeksforgeeks.org/html/mime-media-types/) · [What is S/MIME? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-s-mime/) · [PGP vs S/MIME (GeeksforGeeks)](https://www.geeksforgeeks.org/difference-between-pgp-and-s-mime/)
+
+### Radix-64 (Base64) encoding
+
+**Why it is needed**
+- Encrypted data and digital signatures are **binary** (any byte value 0–255).
+- Email (RFC 822 / SMTP) safely carries only printable 7-bit ASCII, and some mail software alters control characters such as CR/LF.
+- Radix-64 maps binary data into **printable ASCII characters** that survive every mail system unchanged. S/MIME and PGP use it for signatures and encrypted messages.
+
+**How it works**
+1. Take the input **3 bytes (24 bits)** at a time.
+2. Split the 24 bits into **four 6-bit groups**.
+3. Each 6-bit value (0–63) is an index into the **64-character alphabet**:
+   - `A`–`Z` = 0–25
+   - `a`–`z` = 26–51
+   - `0`–`9` = 52–61
+   - `+` = 62, `/` = 63
+4. Output the **4 characters**: so **3 bytes in → 4 characters out**.
+5. **Padding**: if the last group has only 1 or 2 bytes, pad with zero bits and add `=`:
+   - 2 bytes left → 3 characters + `=`
+   - 1 byte left → 2 characters + `==`
+
+**Worked example: encoding "Man"**
+- ASCII: `M` = 77, `a` = 97, `n` = 110.
+- Binary: `01001101 01100001 01101110` (24 bits).
+- Regroup into 6 bits: `010011 | 010110 | 000101 | 101110`.
+- Decimal: 19, 22, 5, 46.
+- Characters: 19 = `T`, 22 = `W`, 5 = `F`, 46 = `u`.
+- Result: **`Man` → `TWFu`**.
+- With padding: `Ma` → **`TWE=`**, and `M` → **`TQ==`**.
+
+**Properties**
+- ✅ **Size grows by about 33%** (every 3 bytes become 4 characters, a ratio of 4/3).
+- ✅ The character set is **universally representable**: it avoids characters with special meaning to SMTP (such as `.` or CR/LF), so it is safe through all gateways.
+- ✅ Encoding is **blind to the content**: it works the same for any binary data, including compressed or encrypted data.
+- ✅ In MIME, encoded lines are limited to **76 characters**.
+- ✅ In PGP, radix-64 output also includes a **CRC-24 checksum** to detect transmission errors (called "ASCII armor").
+- ⚠️ It is **encoding, not encryption**: anyone can decode it, so it gives no confidentiality.
+
+**Further reading:** [Base64 (Wikipedia, with the encoding table)](https://en.wikipedia.org/wiki/Base64) · [Encode an ASCII string into Base-64 (GeeksforGeeks, step-by-step example)](https://www.geeksforgeeks.org/dsa/encode-ascii-string-base-64-format/) · [Binary-to-text encoding (Wikipedia)](https://en.wikipedia.org/wiki/Binary-to-text_encoding)
+
 ## IP Security (IPsec)
 
 IPsec provides general IP security mechanisms that can secure communication across a LAN, across private and public WANs, and across the Internet. IP-level security covers three functional areas. Authentication ensures that a received packet was actually sent by the party named as its source and was not altered in transit. Confidentiality lets nodes encrypt messages to prevent eavesdropping. Key management handles the secure exchange of keys. The current version, IPsecv3, covers authentication and confidentiality, while key management is provided by the Internet Key Exchange standard, IKEv2, which uses the Diffie-Hellman key exchange protocol.
@@ -268,6 +432,30 @@ It terminates the connection immediately; other connections on the session may c
 <details><summary>Q12. Why does S/MIME use radix-64 (base64)?</summary>
 
 Signatures are binary, and email software may alter control characters such as line feeds. Radix-64 maps every 3 bytes into 4 printable ASCII characters so the message travels safely.
+
+</details>
+
+<details><summary>Q12a. Give three limitations of RFC 822 that MIME was designed to fix.</summary>
+
+No binary objects or attachments; ASCII-only text (no national-language characters); no multimedia or multi-part bodies. Also size limits on some servers and gateways that alter messages.
+
+</details>
+
+<details><summary>Q12b. Which SMTP commands send one email, in order? Which ports does SMTP use?</summary>
+
+`HELO`/`EHLO` → `MAIL FROM` → `RCPT TO` (one per recipient) → `DATA` (end with `.`) → `QUIT`. Port 25 for relay, 587 for submission (STARTTLS), 465 for SMTPS.
+
+</details>
+
+<details><summary>Q12c. Name the five MIME header fields.</summary>
+
+`MIME-Version`, `Content-Type`, `Content-Transfer-Encoding`, `Content-ID`, `Content-Description`.
+
+</details>
+
+<details><summary>Q12d. Encode "Man" in radix-64. How much does radix-64 increase the size?</summary>
+
+`TWFu` (19, 22, 5, 46). Size grows by about **33%** (3 bytes become 4 characters).
 
 </details>
 

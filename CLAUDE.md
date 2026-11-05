@@ -21,6 +21,9 @@ When the user shares lecture slides or handouts and asks for notes:
      Short code blocks are fine where the code itself is the example.
    - End each chapter note with a `## Self-test` section of `<details><summary>Question</summary>` blocks, leaving a
      blank line after `<summary>…</summary>` and before `</details>` so the markdown inside renders.
+   - Exception: when the user explicitly asks for bullet notes or reference links for a topic (e.g. the RFC 822 /
+     SMTP / MIME / Radix-64 section in `information-security/08-…`), write that section as bullets and add a
+     "Further reading" link line per topic. Keep the rest of the chapter in prose.
    - The cheat-sheet and practice-questions notes stay as compact lists and tables, since they are for quick revision.
 4. Check facts and arithmetic against the source; label anything not in the source (e.g. "sample solution").
 5. Commit as the user. Every commit must be authored by Yisak-E:
