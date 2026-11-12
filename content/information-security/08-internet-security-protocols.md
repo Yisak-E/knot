@@ -831,6 +831,8 @@ It is a series of messages organised into **four phases**.
 - ❌ Every host must support and be configured for IPsec.
 - **Typical uses:** host-to-host security inside an organisation, client-to-server connections, protecting routing protocols or remote administration (general knowledge).
 
+**Further reading:** [IPsec Tunnel and Transport Modes (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ipsec-internet-protocol-security-tunnel-and-transport-modes/) · [IP Security (IPSec) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ip-security-ipsec/)
+
 ### Tunnel mode: gateway-to-gateway
 
 - **What it protects:** the **entire original IP packet**, including the original IP header. The whole packet becomes the payload of a **new outer IP packet**.
@@ -946,6 +948,8 @@ It is a series of messages organised into **four phases**.
 4. Each packet is protected with **ESP** in **tunnel mode** (new outer header between the gateways).
 5. The receiver uses the **SPI** to find the SA, checks the **sequence number** (anti-replay) and the **ICV**, decrypts, and forwards the inner packet.
 6. Before the SA expires, IKE **re-keys** it.
+
+**Further reading:** [Virtual Private Network (VPN) (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-vpn-how-it-works-types-of-vpn/) · [IPSec Architecture (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/ipsec-architecture/) · [What is an IPsec Tunnel? (GeeksforGeeks)](https://www.geeksforgeeks.org/computer-networks/what-is-an-ipsec-tunnel/)
 
 **In conclusion:** IPsec works at the network layer, so it protects all IP traffic transparently. Transport mode gives end-to-end protection of the payload between hosts, and tunnel mode protects whole packets between gateways (VPNs). ESP provides encryption plus authentication and has replaced AH, which only authenticates. IKE does the key management by authenticating peers, running Diffie-Hellman and creating the SAs.
 
