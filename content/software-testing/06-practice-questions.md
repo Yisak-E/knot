@@ -2,7 +2,7 @@
 title: "Practice Questions — Class Activities with Answers"
 summary: Every Chapter 6 class activity (Parts 1 and 2), the Chapter 4 exercises and the Chapter 4–5 concept inventory, with answers hidden until you click.
 tags: [practice, activities, answers, exam-prep]
-sort: 6
+sort: 8
 ---
 
 Try each question first, then click to reveal the answer.

@@ -2,7 +2,7 @@
 title: "Exam Cheat Sheet — Formulas & Definitions"
 summary: One-page revision sheet with every formula, definition and must-know list from Chapters 4, 5 and 6.
 tags: [cheat-sheet, formulas, revision]
-sort: 5
+sort: 7
 ---
 
 ## Coverage-criteria formulas
@@ -82,3 +82,28 @@ Valid vs invalid · Sub-partition · Boundaries · Normal use · Enumerated type
 - Valid iff a + b > c, a + c > b, b + c > a (and all sides > 0).
 - Equilateral ⊂ isosceles, so use "isosceles **not** equilateral".
 - Refined blocks per side: >1, =1, =0, <0 (values 2, 1, 0, −1). ACoC 64 · BCC 10 · ECC 4 · PWC-min 16.
+
+## Chapter 7 must-knows (graph coverage)
+
+- **Graph** = (N, N₀, Nf, E); N, N₀, Nf non-empty; E may be empty; edges are **ordered** pairs.
+- **Path** length = number of **edges** (single node = length 0). **Test path** = starts in N₀, ends in Nf.
+- **Visit** nodes/edges, **tour** subpaths. path(t) = test path of t; path(T) = set for T.
+- **Syntactic** reachability = a path exists; **semantic** = some input executes it.
+
+| Criterion | TR | Code name / note |
+|---|---|---|
+| NC | each reachable node | statement / basic block coverage |
+| EC | each path of length ≤ 1 | branch coverage |
+| EPC | each path of length ≤ 2 | in × out edges per node |
+| PPC | each prime path | loops 0, 1, many times |
+| CPC | all paths | infinite with loops |
+| SPC | given set S | customer scenarios |
+| SRTC / CRTC | one / all round trips per node | do **not** subsume NC/EC/EPC |
+
+- **Simple path:** no repeated node except first = last. **Prime path:** simple path that is not a proper subpath of another simple path.
+- **Subsumption:** CPC → PPC → (almost) EPC → EC → NC; PPC → CRTC → SRTC; PPC → ADUP → AUC → ADC; AUC → EC.
+- **PPC ⊅ EPC:** a self-edge (2→2) gives EPC requirements that repeat a node, so they can't be prime.
+- **Sidetrip** = leave and return to the **same** node; **detour** = leave and rejoin at a **successor**.
+- **Double diamond:** 2 × 2 = 4 test paths. Counts: 4-node cycle graph 23 simple / 8 prime; 5–6 loop graph 38 simple / 9 prime.
+- **CFG patterns:** while = dummy test node (never loop back to init); for = 5 nodes (init, test, body, increment, exit); do-while = self-edge; if-return = final node, no out-edge; switch without break = fall-through edge; throw → edge to catch.
+- **computeStats:** 8 nodes, 9 edges → EC 9 TRs (one path), EPC 12 TRs, PPC 10 prime paths.
